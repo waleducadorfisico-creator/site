@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<!-- saved from url=(0070)file:///C:/Users/Mils/Desktop/contrato%20Wal%20Ribeiro/consutoria.html -->
+<html lang="pt-BR"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consultoria — Wal Ribeiro</title>
+  
+  <style>
+    :root{--bg:#f4f6f8;--card:#ffffff;--accent:#0b7285;--muted:#6b7280;--text:#0f1724}
+    *{box-sizing:border-box}
+    body{font-family:Inter,system-ui,Arial,sans-serif;background:var(--bg);color:var(--text);margin:0;padding:20px}
+    .wrap{max-width:920px;margin:0 auto}
+    header{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+    h1{font-size:40px;margin:0}
+    p.lead{margin:0;color:var(--muted);font-size:13px}
+    form.card{background:var(--card);padding:18px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.06)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .row{display:flex;gap:12px}
+    label{font-size:13px;color:var(--muted);display:block;margin-bottom:6px}
+    input[type=text], input[type=number], select, textarea{width:100%;padding:10px;border:1px solid #e6edf2;border-radius:8px;background:#fff;font-size:14px}
+    textarea{min-height:80px;resize:vertical}
+    .section{padding:10px 0;border-bottom:1px dashed #eef2f6;margin-bottom:8px}
+    .section h2{margin:6px 0 8px;font-size:15px}
+    .inline{display:flex;gap:8px;align-items:center}
+    .small{font-size:13px;color:var(--muted)}
+    .actions{display:flex;gap:8px;margin-top:12px}
+    button{padding:10px 14px;border-radius:8px;border:none;cursor:pointer}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-ghost{background:#fff;border:1px solid #e6edf2}
+    #preview{margin-top:16px;background:#fff;padding:18px;border-radius:10px;display:none;box-shadow:0 6px 20px rgba(0,0,0,0.08)}
+    #preview img{width:120px;height:120px;border-radius:50%;object-fit:cover;border:3px solid #0b7285;display:block;margin-bottom:12px;}
+    #preview h3{margin:6px 0}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+    @media(max-width:720px){
+      .grid{grid-template-columns:1fr}
+      .two-col{grid-template-columns:1fr}
+      header{flex-direction:column;align-items:flex-start}
+    }
+
+    @media print{
+      body{background:#fff;padding:0}
+      .no-print{display:none}
+      form.card{display:none}
+      #preview{display:block}
+      .wrap{max-width:100%;padding:12mm}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img id="logoImg" src="./Consultoria — Wal Ribeiro_files/2025-09-17.png" alt="Logo Wal Ribeiro" style="width:150px;height:150px;border-radius:50%;object-fit:cover;border:4px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);">
+      <div>
+        <h1>Consultoria — Wal Ribeiro</h1>
+        <p class="lead">Formulário interativo e dossiê do aluno. Visualize e gere PDF — a impressão sairá igual à visualização.</p>
+      </div>
+    </header>
+
+    <form class="card no-print" id="mainForm" onsubmit="return false">
+      <!-- 1 Dados Pessoais -->
+      <section class="section">
+        <h2>1. Dados Pessoais</h2>
+        <div class="grid">
+          <div><label>Nome completo</label><input type="text" id="nome" placeholder="Nome do aluno"></div>
+          <div><label>Data do atendimento</label><input type="text" id="data" placeholder="DD-MM-AAAA"></div>
+          <div><label>Idade</label><input type="number" id="idade"></div>
+          <div><label>Profissão</label><input type="text" id="profissao"></div>
+          <div><label>Contato</label><input type="text" id="contato" placeholder="Telefone ou e-mail"></div>
+          <div class="row">
+            <div style="flex:1"><label>Peso (kg)</label><input type="number" id="peso" step="0.1"></div>
+            <div style="width:140px"><label>Altura (cm)</label><input type="number" id="altura"></div>
+            <div style="width:140px"><label>% Gordura</label><input type="number" id="gordura" step="0.1"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 Histórico de Saúde -->
+      <section class="section">
+        <h2>2. Histórico de Saúde</h2>
+        <div class="grid">
+          <div><label>Doenças pré-existentes / Medicações</label><textarea id="doencas" placeholder="Ex: hipertensão, diabetes, uso de medicação..."></textarea></div>
+          <div><label>Lesões / Cirurgias / Restrição de movimento</label><textarea id="lesoes" placeholder="Descreva locais, datas e limitações"></textarea></div>
+          <div><label>Qualidade do sono (0 a 10)</label><input type="number" id="sono" min="0" max="10"></div>
+          <div><label>Nível de estresse (0 a 10)</label><input type="number" id="estresse" min="0" max="10"></div>
+        </div>
+      </section>
+
+      <!-- 3 Estilo de Vida -->
+      <section class="section">
+        <h2>3. Estilo de Vida</h2>
+        <div class="grid">
+          <div><label>Horas de sono por noite</label><input type="number" id="horasSono" step="0.5"></div>
+          <div><label>Consumo de água (L/dia)</label><input type="number" id="agua" step="0.1"></div>
+          <div class="full"><label>Alimentação (resumo)</label><textarea id="alimentacao" placeholder="Quantas refeições/dia, qualidade, observações"></textarea></div>
+          <div><label>Pratica outros esportes?</label><input type="text" id="outrosEsportes"></div>
+          <div><label>Fumante / Álcool</label><input type="text" id="habitos" placeholder="Ex: não, social, diário..."></div>
+        </div>
+      </section>
+
+      <!-- 4 Objetivos -->
+      <section class="section">
+        <h2>4. Objetivos do Aluno</h2>
+        <div class="grid">
+          <div>
+            <label>Objetivos principais (marcar ou descrever)</label>
+            <div style="display:flex;flex-direction:column;gap:6px;margin-top:6px">
+              <label><input type="checkbox" name="objetivo" value="Perda de gordura"> Perda de gordura</label>
+              <label><input type="checkbox" name="objetivo" value="Hipertrofia"> Hipertrofia</label>
+              <label><input type="checkbox" name="objetivo" value="Condicionamento"> Condicionamento físico</label>
+              <label><input type="checkbox" name="objetivo" value="Saúde/Qualidade de Vida"> Saúde/Qualidade de vida</label>
+              <label><input type="checkbox" name="objetivo" value="Performance"> Performance esportiva</label>
+            </div>
+          </div>
+          <div><label>Objetivo específico / Meta (curto prazo 30 dias)</label><textarea id="metaCurto" placeholder="Ex: perder 2kg, aumentar força no supino..."></textarea></div>
+        </div>
+      </section>
+
+      <!-- 5 Medidas Iniciais -->
+      <section class="section">
+        <h2>5. Medidas Iniciais (avaliação física)</h2>
+        <div class="grid">
+          <div><label>Circunferência braço (cm)</label><input type="number" id="braco" step="0.1"></div>
+          <div><label>Peito (cm)</label><input type="number" id="peito" step="0.1"></div>
+          <div><label>Cintura (cm)</label><input type="number" id="cintura" step="0.1"></div>
+          <div><label>Quadril (cm)</label><input type="number" id="quadril" step="0.1"></div>
+          <div><label>Coxa (cm)</label><input type="number" id="coxa" step="0.1"></div>
+          <div><label>Panturrilha (cm)</label><input type="number" id="panturrilha" step="0.1"></div>
+          <div class="full"><label>Observações sobre a avaliação</label><textarea id="obsAvaliacao"></textarea></div>
+        </div>
+      </section>
+
+      <!-- 6 Planejamento do Treino -->
+      <section class="section">
+        <h2>6. Planejamento do Treino</h2>
+        <div class="grid">
+          <div><label>Frequência semanal</label><input type="text" id="frequencia" placeholder="Ex: 3x por semana"></div>
+          <div><label>Divisão de treino</label><input type="text" id="divisao" placeholder="Ex: Fullbody / PPL / ABC"></div>
+          <div class="full"><label>Principais exercícios sugeridos</label><textarea id="exercicios" placeholder="Lista de exercícios e observações técnicas"></textarea></div>
+          <div><label>Volume/Intensidade inicial</label><input type="text" id="volume" placeholder="Ex: 3x10-12, cargas progressivas"></div>
+          <div><label>Estratégia de progressão</label><input type="text" id="progresso" placeholder="Ex: aumentar 2.5kg a cada 2 semanas"></div>
+        </div>
+      </section>
+
+      <!-- 7 Orientações Gerais -->
+      <section class="section">
+        <h2>7. Orientações Gerais</h2>
+        <div class="grid">
+          <div class="full"><label>Resumos e dicas (nutrição, hidratação, recuperação)</label><textarea id="orientacoes" placeholder="Ex: distribuir proteínas, beber 2-3L/dia, dormir 7-8h..."></textarea></div>
+          <div><label>Aquecimento e alongamento (sugestão)</label><textarea id="aquecimento" placeholder="Ex: 5-10min aerobic leve + mobilidade"></textarea></div>
+          <div><label>Suplementação (se aplicável)</label><input type="text" id="suplementos" placeholder="Ex: whey, creatina (consultar profissional)"></div>
+        </div>
+      </section>
+
+      <!-- 8 Plano de Acompanhamento -->
+      <section class="section">
+        <h2>8. Plano de Acompanhamento</h2>
+        <div class="grid">
+          <div><label>Reavaliação</label><input type="text" id="reavaliacao" placeholder="Ex: a cada 30 dias"></div>
+          <div><label>Métodos de registro</label><input type="text" id="registro" placeholder="Ex: fotos, medidas, performance"></div>
+          <div class="full"><label>Critérios de ajuste</label><textarea id="criterios" placeholder="Quando ajustar treino/dieta..."></textarea></div>
+        </div>
+      </section>
+
+      <!-- 9 Observações -->
+      <section class="section">
+        <h2>9. Observações do Aluno e do Professor</h2>
+        <div class="grid">
+          <div class="full"><label>Anotações do aluno</label><textarea id="anotAluno"></textarea></div>
+          <div class="full"><label>Anotações do treinador / recomendações finais</label><textarea id="anotProf"></textarea></div>
+        </div>
+      </section>
+
+      <div class="actions">
+        <button class="btn-primary" id="btnPreview">Visualizar</button>
+        <button class="btn-ghost" id="btnPdf">Gerar PDF</button>
+        <button class="btn-ghost" id="btnClear" type="button">Limpar</button>
+      </div>
+    </form>
+     
+
+    <div id="preview" style="display: block;"><img src="./Consultoria — Wal Ribeiro_files/2025-09-17.png" alt="Logo Aluno"><h2 id="aluno_nome">Ficha de Consultoria — elias bento</h2><p id="aluno_data">Data: 18/08/1983 • Contato: 34 99919 2892</p><p id="aluno_info">Idade: 42 • Profissão: servidor publioco</p><h3 id="medidas_title">Medidas</h3><p id="medidas_valor">Peso: 93kg • Altura: 186cm • Gordura: 4.6%</p><h3 id="saude_title">Histórico de Saúde</h3><p id="saude_valor">Doenças: nao<br>Lesões: nao</p><h3 id="vida_title">Estilo de Vida</h3><p id="vida_valor">Sono: 6h • Água: 2.1L • Alimentação: 6 refeiçao • Hábitos: sociamente/nao fumante • Esportes: musculaçao</p><h3 id="objetivos_title">Objetivos</h3><p id="objetivos_valor">Perda de gordura, Hipertrofia, Saúde/Qualidade de Vida<br>Meta Curto Prazo: almentar força e ganha massa</p><h3 id="treino_title">Treino</h3><p id="treino_valor">Frequência: 4 dias • Divisão: --- • Exercícios: braço, peito pernas ABS com  4 aulas por semana • Volume: --- • Progresso: medio aluno com aprendisagem</p><h3 id="orientacoes_title">Orientações</h3><p id="orientacoes_valor">tomar 3 litros de aguas por dia, 6 vezes ao dia 500ml por vez<br>Aquecimento: aquecer sempre antes do exercicio com alongamento • Suplementos: creatina para almentar a força e disposição e way isolado par acomplementar a proteina</p><h3 id="acompanhamento_title">Plano de Acompanhamento</h3><p id="acompanhamento_valor">Reavaliação: uma vez por semana • Registro: Circunferência braço (D350 E340),  Peito (1009), Cintura (970), Quadril (470), Coxa (D600  E590 ), Panturrilha (D380  E390) medidas com referencia em Centimetros • Critérios: apos os 45 dias<br></p><h3 id="observacoes_title">Observações</h3><p id="observacoes_valor">Aluno: quero chegar em uma perfoma, e qualidade de vida melhor visualizar o quanto tenho evoluido e melhorado.<br>Treinador: pode ajudalo como proficional na execulção do exercicio, dias de treino quarta, sexta, sabado e domingo, </p></div>
+  </div>
+
+  <script src="./Consultoria — Wal Ribeiro_files/html2pdf.bundle.min.js.download"></script>
+  <script>
+    const form = document.getElementById('mainForm');
+    const preview = document.getElementById('preview');
+
+    const collectValues = () => {
+      const objetivos = Array.from(document.querySelectorAll('input[name="objetivo"]:checked')).map(i=>i.value).join(', ');
+      const fields = Array.from(form.querySelectorAll('input, textarea'));
+      const data = {};
+      fields.forEach(f => data[f.id] = f.value || '---');
+      data.objetivos = objetivos || '---';
+      return data;
+    }
+
+    const nl2br = s => String(s).replace(/\n/g,'<br>');
+
+    const renderPreview = () => {
+      const d = collectValues();
+      let html = `<img src="${document.getElementById('logoImg').src}" alt="Logo Aluno">`;
+      html += `<h2 id="aluno_nome">Ficha de Consultoria — ${d.nome}</h2>`;
+      html += `<p id="aluno_data">Data: ${d.data} • Contato: ${d.contato}</p>`;
+      html += `<p id="aluno_info">Idade: ${d.idade} • Profissão: ${d.profissao}</p>`;
+      html += `<h3 id="medidas_title">Medidas</h3><p id="medidas_valor">Peso: ${d.peso}kg • Altura: ${d.altura}cm • Gordura: ${d.gordura}%</p>`;
+      html += `<h3 id="saude_title">Histórico de Saúde</h3><p id="saude_valor">Doenças: ${nl2br(d.doencas)}<br>Lesões: ${nl2br(d.lesoes)}</p>`;
+      html += `<h3 id="vida_title">Estilo de Vida</h3><p id="vida_valor">Sono: ${d.horasSono}h • Água: ${d.agua}L • Alimentação: ${nl2br(d.alimentacao)} • Hábitos: ${d.habitos} • Esportes: ${d.outrosEsportes}</p>`;
+      html += `<h3 id="objetivos_title">Objetivos</h3><p id="objetivos_valor">${d.objetivos}<br>Meta Curto Prazo: ${nl2br(d.metaCurto)}</p>`;
+      html += `<h3 id="treino_title">Treino</h3><p id="treino_valor">Frequência: ${d.frequencia} • Divisão: ${d.divisao} • Exercícios: ${nl2br(d.exercicios)} • Volume: ${d.volume} • Progresso: ${d.progresso}</p>`;
+      html += `<h3 id="orientacoes_title">Orientações</h3><p id="orientacoes_valor">${nl2br(d.orientacoes)}<br>Aquecimento: ${nl2br(d.aquecimento)} • Suplementos: ${d.suplementos}</p>`;
+      html += `<h3 id="acompanhamento_title">Plano de Acompanhamento</h3><p id="acompanhamento_valor">Reavaliação: ${d.reavaliacao} • Registro: ${d.registro} • Critérios: ${nl2br(d.criterios)}</p>`;
+      html += `<h3 id="observacoes_title">Observações</h3><p id="observacoes_valor">Aluno: ${nl2br(d.anotAluno)}<br>Treinador: ${nl2br(d.anotProf)}</p>`;
+      preview.innerHTML = html;
+      preview.style.display = 'block';
+      preview.scrollIntoView({behavior:'smooth'});
+    }
+
+    document.getElementById('btnPreview').onclick = renderPreview;
+    document.getElementById('btnPdf').onclick = () => html2pdf().from(preview).save();
+    document.getElementById('btnClear').onclick = () => form.reset();
+  </script>
+
+
+</body></html>
