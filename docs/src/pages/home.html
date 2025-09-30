@@ -171,6 +171,9 @@
         const img = document.createElement('img');
         const src = (PUBLIC_PREFIX + '/treinos/' + encodeURIComponent(cat) + '/' + encodeURIComponent(f)).replace(/%2F/g, '/');
         img.src = src; img.alt = f;
+        // friendly name (strip extension, replace underscores/dashes with spaces, capitalize)
+        const friendly = (f || '').replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').replace(/\s+/g,' ').trim();
+        const friendlyLabel = friendly.split(' ').map(s=> s.charAt(0).toUpperCase()+s.slice(1)).join(' ');
         // click: if a day is selected, add this gif to that day with the current sets value; otherwise open raw gif
         img.addEventListener('click', (ev)=>{
           ev.stopPropagation();
@@ -181,6 +184,9 @@
         wrapper.appendChild(img);
         const previewSets = (setsInput && setsInput.value) ? setsInput.value.trim() : '';
         if(previewSets){ const caption = document.createElement('div'); caption.className='caption'; caption.textContent = previewSets; wrapper.appendChild(caption); }
+        // always show the friendly name under the image
+        const nameEl = document.createElement('div'); nameEl.className = 'caption'; nameEl.style.fontWeight = '700'; nameEl.style.marginTop = '6px'; nameEl.textContent = friendlyLabel;
+        wrapper.appendChild(nameEl);
         gallery.appendChild(wrapper);
       });
       // add 'Adicionar todos ao dia' button
