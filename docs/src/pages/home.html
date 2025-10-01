@@ -341,9 +341,18 @@
       try{ const key = 'client_last_' + name; const raw = localStorage.getItem(key); if(raw){ const parsed = JSON.parse(raw||'{}'); if(parsed && typeof parsed === 'object'){ localStorage.setItem('assignments', JSON.stringify(parsed)); renderDayBoxes(); } } }catch(e){}
     });
 
-    // collapse the select back to normal when user picks a client or leaves focus
+    // collapse the select back to normal when user picks a client
     clientsSelect.addEventListener('change', ()=>{ try{ clientsSelect.size = 1; }catch(e){} });
-    clientsSelect.addEventListener('blur', ()=>{ setTimeout(()=>{ try{ clientsSelect.size = 1; }catch(e){} }, 150); });
+    // also collapse when clicking outside the select (prevents 'appear and disappear' issues on some hosts)
+    document.addEventListener('click', (ev)=>{
+      try{
+        const expanded = (clientsSelect.size && clientsSelect.size > 1);
+        if(!expanded) return;
+        const target = ev.target;
+        if(target === clientsSelect || clientsSelect.contains(target) || target === addClientBtn) return;
+        clientsSelect.size = 1;
+      }catch(e){}
+    });
 
     saveClientBtn.addEventListener('click', ()=>{
       const name = (clientsSelect.value||'').trim(); if(!name) return alert('Selecione um cliente para salvar');
