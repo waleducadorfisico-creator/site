@@ -320,12 +320,30 @@
     function refreshClientsUI(){ const list = loadClients(); clientsSelect.innerHTML = ''; const empty = document.createElement('option'); empty.value=''; empty.textContent='-- selecionar cliente --'; clientsSelect.appendChild(empty); list.forEach(name=>{ const o = document.createElement('option'); o.value = name; o.textContent = name; clientsSelect.appendChild(o); }); }
 
     addClientBtn.addEventListener('click', ()=>{
-      const name = (clientNameInput.value||'').trim(); if(!name) return alert('Digite o nome do cliente');
+      const name = (clientNameInput.value||'').trim();
+      // If no name entered: show the saved clients list to choose from
+      if(!name){
+        const list = loadClients();
+        if(!list || list.length === 0){ return alert('Nenhum cliente salvo'); }
+        refreshClientsUI();
+        // expand the select into a listbox so names appear
+        clientsSelect.size = Math.min(8, list.length);
+        clientsSelect.focus();
+        return;
+      }
+
+      // otherwise create/select the provided name
       const list = loadClients(); if(!list.includes(name)) { list.push(name); saveClients(list); }
       refreshClientsUI(); clientsSelect.value = name; clientNameInput.value = '';
+      // collapse select if it was expanded
+      try{ clientsSelect.size = 1; }catch(e){}
       // attempt to auto-load last saved treino for new/existing client
       try{ const key = 'client_last_' + name; const raw = localStorage.getItem(key); if(raw){ const parsed = JSON.parse(raw||'{}'); if(parsed && typeof parsed === 'object'){ localStorage.setItem('assignments', JSON.stringify(parsed)); renderDayBoxes(); } } }catch(e){}
     });
+
+    // collapse the select back to normal when user picks a client or leaves focus
+    clientsSelect.addEventListener('change', ()=>{ try{ clientsSelect.size = 1; }catch(e){} });
+    clientsSelect.addEventListener('blur', ()=>{ setTimeout(()=>{ try{ clientsSelect.size = 1; }catch(e){} }, 150); });
 
     saveClientBtn.addEventListener('click', ()=>{
       const name = (clientsSelect.value||'').trim(); if(!name) return alert('Selecione um cliente para salvar');
