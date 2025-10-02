@@ -23,7 +23,7 @@
   .slider{ position:relative; width:100%; max-width:980px; height:calc(100vh - 160px); background:linear-gradient(180deg,#fff,#fbfdff); border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.06); overflow:hidden; display:flex; align-items:center; justify-content:center }
   .slides{ display:flex; transition:transform .6s cubic-bezier(.22,.9,.32,1); height:100%; }
   .slide{ flex:0 0 100%; display:flex; align-items:center; justify-content:center; }
-  .slide img{ max-width:100%; max-height:100%; object-fit:contain; }
+  .slide img{ max-width:100%; max-height:80%; object-fit:contain; }
   .nav{ position:absolute; top:50%; transform:translateY(-50%); border:0; background:rgba(255,255,255,0.9); width:48px; height:48px; border-radius:8px; cursor:pointer; box-shadow:0 6px 16px rgba(2,6,23,0.12); }
   .nav.prev{ left:14px }
   .nav.next{ right:14px }
@@ -31,6 +31,11 @@
   .indicator{ width:12px; height:12px; border-radius:50%; border:0; background:rgba(0,0,0,0.18); cursor:pointer }
   .indicator.active{ background:var(--accent) }
     @media (max-width:900px){ nav.sidebar{ width:220px } }
+  /* WhatsApp floating action button */
+  .whatsapp-fab{ position:fixed; right:18px; bottom:18px; width:56px; height:56px; background:#25D366; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,0.2); z-index:60; cursor:pointer }
+  .whatsapp-fab svg{ width:28px; height:28px; fill:#fff }
+  .whatsapp-fab:hover{ transform:translateY(-3px); transition:transform .12s ease }
+  @media (max-width:480px){ .whatsapp-fab{ right:12px; bottom:12px; width:48px; height:48px } .whatsapp-fab svg{ width:22px; height:22px } }
   </style>
 </head>
 <body>
@@ -226,6 +231,27 @@
         try{ pageFrame.contentWindow.postMessage({ type: 'refreshClients' }, '*'); }catch(e){ console.warn('Erro ao chamar postMessage para iframe', e); }
       }
     }; }catch(e){/* ignore */}
+  </script>
+  <!-- WhatsApp Floating Button -->
+  <div class="whatsapp-fab" id="whatsappFab" title="Falar no WhatsApp">
+    <!-- WhatsApp SVG icon -->
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.52 3.48A11.93 11.93 0 0012 0C5.373 0 .01 5.373.01 12.002c0 2.116.553 4.17 1.6 5.998L0 24l6.245-1.62A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-11.998 0-3.2-1.247-6.2-3.48-8.522zM12 21.6c-1.45 0-2.873-.392-4.112-1.134l-.293-.173-3.708.962.99-3.614-.19-.294A8.427 8.427 0 013.6 12.002C3.6 7.04 7.038 3.6 12 3.6c2.182 0 4.218.848 5.752 2.385C19.29 8.11 19.98 10.59 19.98 12c0 4.96-3.44 9.6-7.98 9.6zM17.06 14.89c-.27-.136-1.606-.793-1.855-.883-.248-.09-.43-.136-.612.136-.182.273-.706.883-.866 1.06-.16.182-.32.205-.593.07-.27-.136-1.145-.422-2.18-1.349-.806-.72-1.35-1.61-1.51-1.885-.16-.273-.017-.42.12-.556.123-.123.273-.32.41-.48.14-.16.186-.273.28-.455.094-.182.047-.34-.023-.476-.07-.136-.612-1.473-.84-2.014-.224-.534-.45-.461-.612-.47l-.523-.012c-.18 0-.47.07-.716.34-.248.273-.944.924-.944 2.252 0 1.327.967 2.612 1.103 2.792.136.182 1.9 2.9 4.61 3.955 1.715.742 2.688.99 3.61.998.584.006 1.81-.713 2.066-1.401.256-.688.256-1.278.18-1.401-.07-.12-.25-.182-.52-.315z"/></svg>
+  </div>
+  <script>
+    (function(){
+      const fab = document.getElementById('whatsappFab');
+      if(!fab) return;
+  // Replace this with your phone number in international format without + or spaces, e.g. '34988617229'
+  const phone = '34988617229';
+      function isMobile(){ return /Mobi|Android/i.test(navigator.userAgent); }
+      fab.addEventListener('click', ()=>{
+        const text = encodeURIComponent('Olá, gostaria de informações.');
+        let url = '';
+        if(isMobile()){ url = `https://wa.me/${phone}?text=${text}`; }
+        else { url = `https://web.whatsapp.com/send?phone=${phone}&text=${text}`; }
+        window.open(url, '_blank');
+      });
+    })();
   </script>
 </body>
 </html>
