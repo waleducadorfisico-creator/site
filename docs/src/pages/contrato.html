@@ -4,133 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Contrato — Wal Ribeiro Educador Físico (12 aulas)</title>
-  <!-- Apenas o trecho do <style> precisa ser trocado, o resto do HTML permanece igual -->
-<style>
-  body {
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-    max-width: 920px;
-    margin: 18px auto;
-    padding: 18px;
-    background: #f6f8fb;
-  }
-  header {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-  header img {
-    height: 68px;
-    width: 68px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #e2e8f0;
-  }
-  .contract {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    padding: 18px;
-    overflow: auto;
-    border-radius: 10px;
-  }
-  .controls {
-    margin-top: 14px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-  }
-  label {
-    display: block;
-    margin-bottom: 6px;
-  }
-  .sign-area {
-    border: 1px dashed #cbd5e1;
-    padding: 8px;
-    border-radius: 8px;
-    background: #fbfdff;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-  .sign-area canvas {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    touch-action: none;
-    width: 100%;
-    max-width: 100%;
-    height: 120px;
-    min-height: 80px;
-    display: block;
-  }
-  .small {
-    font-size: 0.95rem;
-    color: #475569;
-  }
-  button {
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 0;
-    background: #0b5cff;
-    color: white;
-    cursor: pointer;
-  }
-  .muted {
-    color: #64748b;
-    font-size: 0.9rem;
-  }
-  footer {
-    margin-top: 18px;
-    font-size: 0.85rem;
-    color: #475569;
-  }
-  input[type=text], input[type=date] {
-    width: 100%;
-    padding: 8px;
-    border-radius: 6px;
-    border: 1px solid #cbd5e1;
-    box-sizing: border-box;
-  }
-  .actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  <style>
+    :root{--max-w:920px}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:18px auto;padding:18px;background:#f6f8fb;max-width:var(--max-w)}
+    header{display:flex;justify-content:flex-start;align-items:center;gap:12px;margin-bottom:14px}
+    header img{height:68px;width:68px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0;max-width:20%}
+    header h1{font-size:1.25rem;margin:0}
+    .contract{background:#fff;border:1px solid #e2e8f0;padding:18px;overflow:auto;border-radius:10px}
+    .controls {margin-top:14px;display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start}
+    label{display:block;margin-bottom:6px}
+    .sign-area{border:1px dashed #cbd5e1;padding:8px;border-radius:8px;background:#fbfdff}
+    canvas{background:#fff;border:1px solid #e2e8f0;border-radius:6px;touch-action:none;display:block;width:100%;height:auto;max-height:220px}
+    .small{font-size:0.95rem;color:#475569}
+    button{padding:10px 14px;border-radius:8px;border:0;background:#0b5cff;color:white;cursor:pointer}
+    .muted{color:#64748b;font-size:0.9rem}
+    footer{margin-top:18px;font-size:0.85rem;color:#475569}
+    input[type=text], input[type=date]{width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
 
-  /* RESPONSIVIDADE PARA CELULAR */
-  @media (max-width: 700px) {
-    body {
-      padding: 8px;
-      margin: 0;
+    /* Responsive adjustments */
+    @media (max-width:860px){
+      :root{--max-w:100%}
+      body{padding:12px;margin:6px}
+      .controls{grid-template-columns:1fr;}
+      header{gap:10px}
+      header img{height:56px;width:56px}
+      .contract{padding:14px}
+      canvas{max-height:160px}
     }
-    header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
+    @media (max-width:420px){
+      header{flex-direction:row;align-items:center}
+      header div{font-size:0.95rem}
+      header img{height:48px;width:48px}
+      .actions button{flex:1}
     }
-    header img {
-      height: 54px;
-      width: 54px;
-    }
-    .contract {
-      padding: 10px;
-    }
-    .controls {
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    .sign-area canvas {
-      height: 70px;
-      min-height: 50px;
-      max-height: 80px;
-    }
-    .actions {
-      flex-direction: column;
-      gap: 8px;
-    }
-  }
-</style>
+  </style>
 </head>
 <body>
 
@@ -154,12 +63,12 @@
 
       <h3>Opções e valores</h3>
       <ul>
-        <li><strong>Opção 1:</strong> 12 aulas com 1 reposição por pacote (mês) — R$60,00/aula (total R$720,00)</li>
+        <li><strong>Opção 1:</strong> 12 aulas com 1 reposição por aula desmarcada — R$60,00/aula (total R$720,00)</li>
         <li><strong>Opção 2:</strong> 12 aulas sem reposição de aula— R$50,00/aula (total R$600,00)</li>
       </ul>
 
       <h3>Cláusulas</h3>
-      <p><strong>1. Agendamento e Reposição.</strong> Aulas agendadas de comum acordo. Reposição conforme opção escolhida, não transfeda para o proximo mês, caso o professor falte ele remarcara o dia conforme a disponabilidade de ambas parte.</p>
+      <p><strong>1. Agendamento e Reposição.</strong> Aulas agendadas de comum acordo. Reposição conforme opção escolhida.</p>
       <p><strong>2. Pagamento.</strong> À vista ou parcelado + taxa maquininha; atraso pode suspender atendimento.</p>
       <p><strong>3. Obrigações do CONTRATADO.</strong> Prestar serviços com zelo técnico e sigilo.</p>
       <p><strong>4. Obrigações do CONTRATANTE.</strong> Informar condições médicas, seguir orientações e cumprir horários.</p>
@@ -175,7 +84,7 @@
     <div class="controls">
       <div>
         <label>Escolha a opção do pacote:</label>
-        <label><input type="radio" name="option" value="Opção 1 — 12 aulas com reposição de uma aula (R$60,00)" checked> Opção 1 — 12 aulas com uma reposição (caso o aluno falte)</label>
+        <label><input type="radio" name="option" value="Opção 1 — 12 aulas com reposição de uma aula (R$60,00)" checked> Opção 1 — 12 aulas com reposição</label>
         <label><input type="radio" name="option" value="Opção 2 — 12 aulas sem reposição (R$50,00)"> Opção 2 — 12 aulas sem reposição</label>
 
         <label>Nome completo:</label>
@@ -226,29 +135,40 @@
     ctx.lineWidth = 2.4;
     ctx.lineCap = 'round';
 
+    // Make the canvas responsive: base its internal pixel size on displayed CSS width and devicePixelRatio
     function resizeCanvasForDPI() {
       const ratio = Math.max(window.devicePixelRatio || 1, 1);
-      const w = canvas.width;
-      const h = canvas.height;
-      canvas.width = w * ratio;
-      canvas.height = h * ratio;
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
+      // desired CSS width (in px) - use parent width or a sensible default
+      const cssWidth = Math.min(1000, canvas.parentElement.clientWidth || 600);
+      const cssHeight = 140; // keep similar aspect ratio
+      // set display size (CSS)
+      canvas.style.width = cssWidth + 'px';
+      canvas.style.height = cssHeight + 'px';
+      // set actual pixel size scaled by ratio
+      canvas.width = Math.floor(cssWidth * ratio);
+      canvas.height = Math.floor(cssHeight * ratio);
+      // reset transform and scale to DPR
+      ctx.setTransform(1,0,0,1,0,0);
       ctx.scale(ratio, ratio);
+      ctx.lineWidth = 2.4;
+      ctx.lineCap = 'round';
     }
+    // initial resize and on orientation/resize events
     resizeCanvasForDPI();
+    window.addEventListener('resize', () => { const imgData = canvas.toDataURL(); resizeCanvasForDPI(); // restore previous drawing if any
+      const img = new Image(); img.onload = ()=>{ ctx.drawImage(img,0,0, canvas.width/Math.max(window.devicePixelRatio||1,1), canvas.height/Math.max(window.devicePixelRatio||1,1)); }; img.src = imgData; });
 
-    function pointerDown(e){ drawing=true; ctx.beginPath(); const p=getPos(e); ctx.moveTo(p.x,p.y);}
-    function pointerMove(e){ if(!drawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();}
-    function pointerUp(e){ drawing=false;}
-    function getPos(e){ const rect=canvas.getBoundingClientRect(); const x=(e.touches?e.touches[0].clientX:e.clientX)-rect.left; const y=(e.touches?e.touches[0].clientY:e.clientY)-rect.top; return {x,y};}
+  function pointerDown(e){ e.preventDefault(); drawing=true; ctx.beginPath(); const p=getPos(e); ctx.moveTo(p.x,p.y);}
+  function pointerMove(e){ if(!drawing) return; e.preventDefault(); const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();}
+  function pointerUp(e){ drawing=false;}
+  function getPos(e){ const rect=canvas.getBoundingClientRect(); const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX; const clientY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY; const x=(clientX)-rect.left; const y=(clientY)-rect.top; return {x,y};}
     canvas.addEventListener('mousedown',pointerDown);
     canvas.addEventListener('mousemove',pointerMove);
     window.addEventListener('mouseup',pointerUp);
     canvas.addEventListener('touchstart',pointerDown);
     canvas.addEventListener('touchmove',pointerMove);
     window.addEventListener('touchend',pointerUp);
-    document.getElementById('clearBtn').addEventListener('click',()=>ctx.clearRect(0,0,canvas.width,canvas.height));
+  document.getElementById('clearBtn').addEventListener('click',()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); });
 
     // Máscara CPF
     document.getElementById('signerCPF').addEventListener('input', e=>{
@@ -292,27 +212,126 @@
     }
 
     async function createPdfFromElement(element){
-      status.textContent='Gerando imagem do contrato...';
-      const canvasImg=await html2canvas(element,{scale:2});
-      const imgData=canvasImg.toDataURL('image/png');
+      status.textContent = 'Gerando PDF de texto do contrato...';
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p','pt','a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 40;
+      const usableWidth = pageWidth - margin * 2;
 
-      status.textContent='Criando PDF...';
-      const { jsPDF }=window.jspdf;
-      const pdf=new jsPDF('p','pt','a4');
-      const pageWidth=pdf.internal.pageSize.getWidth();
-      const pageHeight=pdf.internal.pageSize.getHeight();
+      // logo no topo (primeira página) - centralizar horizontalmente
+      let logoHeight = 0;
+      let firstPageTop = 80; // default
+      try{
+        const logoSrc = document.getElementById('logoImg').src;
+        const logoData = await getBase64FromUrl(logoSrc);
+        const logoWidth = 60;
+        logoHeight = 60;
+        const centerX = (pageWidth - logoWidth) / 2;
+        pdf.addImage(logoData, 'PNG', centerX, 10, logoWidth, logoHeight);
+        firstPageTop = 10 + logoHeight + 20; // put text below the centered logo
+      }catch(e){ /* ignore logo fetch errors */ }
 
-      // Logo no topo
-      const logoSrc=document.getElementById('logoImg').src;
-      const logoData=await getBase64FromUrl(logoSrc);
-      pdf.addImage(logoData,'PNG',20,10,60,60);
+      // Collect filled data (option, name, cpf, date)
+      const opt = (document.querySelector('input[name="option"]:checked')||{}).value || '';
+      const name = document.getElementById('signerName').value || '---';
+      const cpf = document.getElementById('signerCPF').value || '---';
+      const date = document.getElementById('signDate').value || new Date().toLocaleDateString();
 
-      // Conteúdo ajustado à página
-      const imgWidth=pageWidth-40; // margem de 20px
-      const imgHeight=(canvasImg.height*imgWidth)/canvasImg.width;
-      let position=80;
+  // Get contract text (plain) to add as selectable text
+  // Use innerText to preserve line breaks and lists
+  const contractTextRaw = element.innerText || '';
+  const filledText = `Opção escolhida: ${opt}\nNome: ${name}\nCPF: ${cpf}\nData: ${date}\n\n`;
+  // remove any existing filledText inserted into the element to avoid duplication
+  const contractText = contractTextRaw.replace(filledText, '');
+  const fullText = contractText; // we'll append the colored option at the end separately
 
-      pdf.addImage(imgData,'PNG',20,position,imgWidth,imgHeight);
+      // Add text to PDF using jsPDF text flow
+      const fontSize = 12;
+      pdf.setFontSize(fontSize);
+      const lineHeight = fontSize * 1.25;
+
+      // split text into lines that fit the usable width
+      const lines = pdf.splitTextToSize(fullText, usableWidth);
+
+      // Calculate pagination: first page starts below logo
+  // firstPageTop may have been set above when logo was added
+      const otherPageTop = margin;
+  const firstPageLines = Math.floor((pageHeight - firstPageTop - margin) / lineHeight);
+      const otherPageLines = Math.floor((pageHeight - otherPageTop - margin) / lineHeight);
+
+      let index = 0;
+      let page = 1;
+      while (index < lines.length){
+        const top = (page === 1) ? firstPageTop : otherPageTop;
+        const maxLines = (page === 1) ? firstPageLines : otherPageLines;
+        const slice = lines.slice(index, index + maxLines);
+        pdf.text(slice, margin, top, { maxWidth: usableWidth, align: 'left' });
+        index += slice.length;
+        if (index < lines.length){ pdf.addPage(); page++; }
+      }
+
+      // After writing contract text, append the filled option in color at the end
+      try{
+        const totalPagesBeforeSig = pdf.getNumberOfPages();
+        let lastPage = totalPagesBeforeSig;
+        pdf.setPage(lastPage);
+        // compute lines per last page
+        const maxLinesLast = (lastPage === 1) ? firstPageLines : otherPageLines;
+        const usedLinesOnLast = lines.length % maxLinesLast || maxLinesLast;
+        let yOption = ((lastPage === 1) ? firstPageTop : otherPageTop) + (usedLinesOnLast * lineHeight) + 8;
+        if (yOption + 24 > pageHeight - margin) { // not enough space, create a new last page
+          pdf.addPage();
+          lastPage = pdf.getNumberOfPages();
+          pdf.setPage(lastPage);
+          yOption = otherPageTop;
+        }
+        // draw the option text in color (blue)
+        pdf.setFontSize(12);
+        pdf.setTextColor(11,92,255); // blue
+        pdf.text(`Opção escolhida: ${opt}`, margin, yOption);
+        // reset color
+        pdf.setTextColor(0,0,0);
+      }catch(e){ /* ignore option draw errors */ }
+
+      // Add signature image inside a boxed area on page 2 with caption 'Assinado!'
+      try{
+        const sigData = canvas.toDataURL('image/png');
+        let totalPages = pdf.getNumberOfPages();
+        // Ensure there is a page 2 - if not, create it
+        if (totalPages < 2) {
+          pdf.addPage();
+          totalPages = pdf.getNumberOfPages();
+        }
+        const targetPage = 2;
+        pdf.setPage(targetPage);
+
+        // Box dimensions and position (centered horizontally, near bottom)
+        const sigBoxWidth = 160;
+        const sigBoxHeight = 70;
+        const boxX = (pageWidth - sigBoxWidth) / 2;
+        const boxY = pageHeight - margin - sigBoxHeight - 30; // 30pt space for caption
+
+        // Draw rectangle (box)
+        pdf.setDrawColor(50);
+        pdf.setLineWidth(0.9);
+        pdf.rect(boxX, boxY, sigBoxWidth, sigBoxHeight);
+
+        // Place signature image inside box with small padding
+        const pad = 6;
+        const imgX = boxX + pad;
+        const imgY = boxY + pad;
+        const imgW = sigBoxWidth - pad * 2;
+        const imgH = sigBoxHeight - pad * 2;
+        pdf.addImage(sigData, 'PNG', imgX, imgY, imgW, imgH);
+
+        // Caption below the box
+        const caption = 'Assinado!';
+        pdf.setFontSize(12);
+        pdf.setTextColor(20);
+        pdf.text(caption, pageWidth / 2, boxY + sigBoxHeight + 18, { align: 'center' });
+      } catch (e) { /* ignore signature add errors */ }
 
       return pdf;
     }
@@ -361,4 +380,3 @@
   </script>
 </body>
 </html>
-
