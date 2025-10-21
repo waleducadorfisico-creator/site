@@ -157,7 +157,7 @@
   (function(){
     // Ensure we're using the correct path for categories.json and images
     const pathname = window.location.pathname || '';
-    const base = pathname.includes('/site-main') ? '/site-main/docs' : '/docs';
+    const base = '/site/docs';
     const PUBLIC_PREFIX = (base + '/public').replace(/\/\//g, '/');
     console.log('Base path:', base);
     console.log('Public prefix:', PUBLIC_PREFIX);
@@ -582,3 +582,4 @@
   </script>
 </body>
 </html>
+
