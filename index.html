@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Wal - Portal</title>
+  <style>
+    :root{ --bg:#f7f9fc; --accent:#1e3a8a }
+    body{ margin:0; font-family:system-ui,Segoe UI,Arial,Helvetica,sans-serif; background:var(--bg); }
+    header{ height:56px; display:flex; align-items:center; gap:12px; padding:0 12px; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,0.06); }
+    .brand{ font-weight:700; color:var(--accent) }
+    .hamburger{ width:42px; height:42px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer; border:1px solid rgba(0,0,0,0.06); }
+    .hamburger .bar{ width:18px; height:2px; background:var(--accent); position:relative; }
+    .hamburger .bar::before, .hamburger .bar::after{ content:''; position:absolute; left:0; width:18px; height:2px; background:var(--accent); }
+    .hamburger .bar::before{ top:-6px } .hamburger .bar::after{ top:6px }
+    nav.sidebar{ position:fixed; left:0; top:56px; bottom:0; width:260px; background:#fff; box-shadow:2px 0 6px rgba(0,0,0,0.06); transform:translateX(-110%); transition:transform .22s ease; z-index:40; padding:12px; box-sizing:border-box }
+    nav.sidebar.open{ transform:translateX(0) }
+    nav.sidebar a{ display:block; padding:10px 12px; color:#111; border-radius:6px; text-decoration:none; margin-bottom:6px }
+    nav.sidebar a:hover{ background:#f0f4ff; color:var(--accent) }
+    main{ margin-top:12px; padding:12px; }
+  .frame-wrap{ width:100%; height:calc(100vh - 80px); box-sizing:border-box; padding:12px; display:flex; align-items:center; justify-content:center }
+  /* Slider */
+  .slider{ position:relative; width:100%; max-width:980px; height:calc(100vh - 160px); background:linear-gradient(180deg,#fff,#fbfdff); border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.06); overflow:hidden; display:flex; align-items:center; justify-content:center }
+  .slides{ display:flex; transition:transform .6s cubic-bezier(.22,.9,.32,1); height:100%; }
+  .slide{ flex:0 0 100%; display:flex; align-items:center; justify-content:center; }
+  .slide img{ max-width:100%; max-height:80%; object-fit:contain; }
+  .nav{ position:absolute; top:50%; transform:translateY(-50%); border:0; background:rgba(255,255,255,0.9); width:48px; height:48px; border-radius:8px; cursor:pointer; box-shadow:0 6px 16px rgba(2,6,23,0.12); }
+  .nav.prev{ left:14px }
+  .nav.next{ right:14px }
+  .indicators{ position:absolute; bottom:14px; left:50%; transform:translateX(-50%); display:flex; gap:8px }
+  .indicator{ width:12px; height:12px; border-radius:50%; border:0; background:rgba(0,0,0,0.18); cursor:pointer }
+  .indicator.active{ background:var(--accent) }
+    @media (max-width:900px){ nav.sidebar{ width:220px } }
+  /* WhatsApp floating action button */
+  .whatsapp-fab{ position:fixed; right:18px; bottom:18px; width:56px; height:56px; background:#25D366; border-radius:50%; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(0,0,0,0.2); z-index:60; cursor:pointer }
+  .whatsapp-fab svg{ width:28px; height:28px; fill:#fff }
+  .whatsapp-fab:hover{ transform:translateY(-3px); transition:transform .12s ease }
+  @media (max-width:480px){ .whatsapp-fab{ right:12px; bottom:12px; width:48px; height:48px } .whatsapp-fab svg{ width:22px; height:22px } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="hamburger" id="hamburger" aria-label="Abrir menu" title="Menu">
+      <div class="bar"></div>
+    </div>
+    <div class="brand">Wal - Educador Fisico</div>
+  <img src="assets/logo.png" alt="Logo" id="headerLogo" style="height:46px; width:auto; display:block; margin-left: auto;" />
+  </header>
+
+  <nav class="sidebar" id="sidebar" aria-hidden="true">
+    <a href="#" data-target="home">Início</a>
+    <a href="#" data-target="docs/src/pages/contrato.html">Contrato</a>
+    <a href="#" data-target="docs/src/pages/Consutoria.html">Consultoria</a>
+    <a href="#" data-target="docs/src/pages/home.html">...</a>
+    <hr>
+    <small style="color:#666">Versão estática para GitHub Pages</small>
+  </nav>
+
+  <main>
+    <div class="frame-wrap">
+  <!-- Slider de fotos central -->
+  <div class="slider" id="slider">
+        <div class="slides" id="slides">
+          <div class="slide"><img src="assets/c69f4dd50126e99af24a18060359ff87.jpg" alt="alongamento"></div>
+          <div class="slide"><img src="assets/motiv.jpg" alt="bicicleta"></div>
+          <div class="slide"><img src="assets/motivacional.jpg" alt="corrida"></div>
+          
+        </div>
+          <button class="nav prev" id="prev" aria-label="Anterior">❮</button>
+          <button class="nav next" id="next" aria-label="Próximo">❯</button>
+          <div class="indicators" id="indicators"></div>
+      </div>
+        <!-- iframe para carregar páginas internas sem abrir nova aba -->
+        <iframe id="pageFrame" class="app-frame" style="display:none; width:100%; height:100%; border:0; border-radius:10px;" title="Página interna"></iframe>
+    </div>
+  </main>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+  const links = sidebar.querySelectorAll('a[data-target]');
+  // If an internal page is loaded into the iframe, hide its header/menu to avoid duplicate UI
+  (function(){
+    const iframe = document.getElementById('pageFrame');
+    if(!iframe) return;
+    iframe.addEventListener('load', ()=>{
+      try{
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        if(!doc) return;
+        // selectors that commonly represent the top header/menu in the embedded pages
+        const selectors = [ 'header', '.hamburger', 'nav.sidebar', '#sidebar', '#hamburger', '.topbar', '.site-header' ];
+        selectors.forEach(sel=>{
+          doc.querySelectorAll(sel).forEach(el=>{
+            try{ el.style.display = 'none'; }catch(e){}
+          });
+        });
+        // also try to collapse any select/menu that might conflict (common classes)
+        doc.querySelectorAll('select, .menu, .dropdown, .nav').forEach(el=>{ try{ el.style.display = 'none'; }catch(e){} });
+      }catch(e){ /* ignore cross-origin or timing issues */ }
+    }, { passive: true });
+  })();
+  // slider elements
+  const slider = document.getElementById('slider');
+  const slidesEl = document.getElementById('slides');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const indicators = document.getElementById('indicators');
+
+    function toggle(){ const open = sidebar.classList.toggle('open'); sidebar.setAttribute('aria-hidden', (!open).toString()); }
+    hamburger.addEventListener('click', toggle);
+
+    links.forEach(a=> a.addEventListener('click', (e)=>{
+      e.preventDefault(); const t = a.dataset.target; if(!t) return;
+      const pageFrame = document.getElementById('pageFrame');
+      // Caso: 'Início' (data-target == 'home' ou 'index.html') deve mostrar o slider
+      const isSliderTrigger = (t === 'home') || t.toString().endsWith('index.html');
+      // Caso: target apontando explicitamente para a página home.html -> carregar a página no iframe
+      const isHomePageFile = t.toString().endsWith('home.html');
+
+      if(isSliderTrigger){
+        try{ goTo(0); }catch(err){}
+        if(pageFrame) pageFrame.style.display='none';
+        slider.style.display = '';
+        startAuto();
+        sidebar.classList.remove('open'); sidebar.setAttribute('aria-hidden','true');
+        return;
+      }
+
+      if(isHomePageFile){
+        // carregar src/pages/home.html dentro do iframe
+        if(pageFrame){ stopAuto(); slider.style.display='none'; pageFrame.style.display=''; pageFrame.src = t; }
+        else { window.open(t, '_blank'); }
+        sidebar.classList.remove('open'); sidebar.setAttribute('aria-hidden','true');
+        return;
+      }
+
+    // Caso padrão: carregar qualquer outra página no iframe (mesma tela)
+  if(pageFrame){ stopAuto(); slider.style.display='none'; pageFrame.style.display=''; pageFrame.src = t; }
+      else { window.open(t, '_blank'); }
+      sidebar.classList.remove('open'); sidebar.setAttribute('aria-hidden','true');
+    }));
+
+    // --- Slider logic ---
+    const slides = Array.from(slidesEl.children);
+    let current = 0;
+    let autoplay = true;
+    let timer = null;
+
+    function goTo(idx){ current = (idx + slides.length) % slides.length; const offset = -current * 100; slidesEl.style.transform = `translateX(${offset}%)`; updateIndicators(); }
+    function next(){ goTo(current + 1); }
+    function prev(){ goTo(current - 1); }
+    function startAuto(){ if(timer) clearInterval(timer); timer = setInterval(()=>{ next(); }, 3500); }
+    function stopAuto(){ if(timer) clearInterval(timer); timer = null; }
+    nextBtn.addEventListener('click', ()=>{ next(); if(autoplay){ stopAuto(); startAuto(); } });
+    prevBtn.addEventListener('click', ()=>{ prev(); if(autoplay){ stopAuto(); startAuto(); } });
+
+    // indicators
+    slides.forEach((s, i)=>{ const btn = document.createElement('button'); btn.className='indicator'; btn.setAttribute('aria-label','Ir para slide '+(i+1)); btn.addEventListener('click', ()=>{ goTo(i); if(autoplay){ stopAuto(); startAuto(); } }); indicators.appendChild(btn); });
+    function updateIndicators(){ indicators.querySelectorAll('.indicator').forEach((b, i)=> b.classList.toggle('active', i===current)); }
+    // init styles and start
+    slidesEl.style.width = (slides.length * 100) + '%'; slides.forEach(s=> s.style.width = (100 / slides.length) + '%'); goTo(0); startAuto();
+
+    // --- Hash handling: permite abrir páginas diretamente via index.html#src/pages/xxx.html
+    function loadFromHash(){
+      const h = location.hash.slice(1);
+      const pageFrame = document.getElementById('pageFrame');
+      if(!h){
+        // sem hash: mostrar slider
+        if(pageFrame) pageFrame.style.display = 'none';
+        slider.style.display = '';
+        startAuto();
+        return;
+      }
+      // ex: src/pages/home.html
+      try{
+          if(pageFrame){
+          stopAuto();
+          slider.style.display = 'none';
+          pageFrame.style.display = '';
+          pageFrame.src = h;
+        } else {
+          // fallback
+          window.location.href = h;
+        }
+      }catch(e){ console.warn('Erro ao carregar hash target', e); }
+    }
+    window.addEventListener('hashchange', loadFromHash);
+    // executar na carga inicial
+    loadFromHash();
+
+    // Escutar mensagens postMessage vindas do iframe (por exemplo, add-client)
+    window.addEventListener('message', (ev)=>{
+      try{
+        const msg = ev.data || {};
+        console.log('[index] mensagem recebida via postMessage:', msg);
+  if(msg && msg.type === 'loadPage' && msg.page){
+          // opcional: armazenar ultimoCliente no localStorage do pai
+          try{ if(msg.ultimoCliente) localStorage.setItem('ultimoCliente', msg.ultimoCliente); }catch(e){}
+          // preferimos usar hash para manter histórico e permitir loadFromHash lidar com o carregamento
+          location.hash = msg.page;
+          // garantir que iframe esteja visível
+          const pageFrame = document.getElementById('pageFrame');
+          if(pageFrame){
+            stopAuto(); slider.style.display='none'; pageFrame.style.display='';
+            // quando o iframe terminar de carregar, pedir refresh dos clientes
+            pageFrame.onload = function(){
+              try{ pageFrame.contentWindow.postMessage({ type: 'refreshClients' }, '*'); }catch(e){ /* ignore */ }
+            };
+            pageFrame.src = msg.page;
+          }
+        }
+        // Quando o iframe enviar a lista atualizada de clientes
+        if(msg && msg.type === 'clientesUpdated'){
+          try{
+            if(Array.isArray(msg.clientes)) localStorage.setItem('clientes', JSON.stringify(msg.clientes));
+            if(msg.ultimoCliente) localStorage.setItem('ultimoCliente', msg.ultimoCliente);
+          }catch(e){}
+          const pageFrame = document.getElementById('pageFrame');
+          try{
+            // carregar a home e forçar refresh após onload
+            pageFrame.onload = function(){ try{ pageFrame.contentWindow.postMessage({ type: 'refreshClients' }, '*'); }catch(e){} };
+            pageFrame.src = '/src/pages/home.html'; pageFrame.style.display=''; slider.style.display='none'; stopAuto();
+          }catch(e){ console.warn('Erro ao processar clientesUpdated', e); }
+        }
+      }catch(e){ console.warn('Erro ao processar mensagem postMessage:', e); }
+    });
+    // Expor função para refresh direto (same-origin)
+    try{ window.refreshClients = function(){
+      const pageFrame = document.getElementById('pageFrame');
+      if(pageFrame && pageFrame.contentWindow){
+        try{ pageFrame.contentWindow.postMessage({ type: 'refreshClients' }, '*'); }catch(e){ console.warn('Erro ao chamar postMessage para iframe', e); }
+      }
+    }; }catch(e){/* ignore */}
+  </script>
+  <!-- WhatsApp Floating Button -->
+  <div class="whatsapp-fab" id="whatsappFab" title="Falar no WhatsApp">
+    <!-- WhatsApp SVG icon -->
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M20.52 3.48A11.93 11.93 0 0012 0C5.373 0 .01 5.373.01 12.002c0 2.116.553 4.17 1.6 5.998L0 24l6.245-1.62A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-11.998 0-3.2-1.247-6.2-3.48-8.522zM12 21.6c-1.45 0-2.873-.392-4.112-1.134l-.293-.173-3.708.962.99-3.614-.19-.294A8.427 8.427 0 013.6 12.002C3.6 7.04 7.038 3.6 12 3.6c2.182 0 4.218.848 5.752 2.385C19.29 8.11 19.98 10.59 19.98 12c0 4.96-3.44 9.6-7.98 9.6zM17.06 14.89c-.27-.136-1.606-.793-1.855-.883-.248-.09-.43-.136-.612.136-.182.273-.706.883-.866 1.06-.16.182-.32.205-.593.07-.27-.136-1.145-.422-2.18-1.349-.806-.72-1.35-1.61-1.51-1.885-.16-.273-.017-.42.12-.556.123-.123.273-.32.41-.48.14-.16.186-.273.28-.455.094-.182.047-.34-.023-.476-.07-.136-.612-1.473-.84-2.014-.224-.534-.45-.461-.612-.47l-.523-.012c-.18 0-.47.07-.716.34-.248.273-.944.924-.944 2.252 0 1.327.967 2.612 1.103 2.792.136.182 1.9 2.9 4.61 3.955 1.715.742 2.688.99 3.61.998.584.006 1.81-.713 2.066-1.401.256-.688.256-1.278.18-1.401-.07-.12-.25-.182-.52-.315z"/></svg>
+  </div>
+  <script>
+    (function(){
+      const fab = document.getElementById('whatsappFab');
+      if(!fab) return;
+  // Replace this with your phone number in international format without + or spaces, e.g. '34988617229'
+  const phone = '34988617229';
+      function isMobile(){ return /Mobi|Android/i.test(navigator.userAgent); }
+      fab.addEventListener('click', ()=>{
+        const text = encodeURIComponent('Olá, gostaria de informações.');
+        let url = '';
+        if(isMobile()){ url = `https://wa.me/${phone}?text=${text}`; }
+        else { url = `https://web.whatsapp.com/send?phone=${phone}&text=${text}`; }
+        window.open(url, '_blank');
+      });
+    })();
+  </script>
+</body>
+</html>
+
+
