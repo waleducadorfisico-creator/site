@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contrato — Wal Ribeiro Educador Físico (12 aulas)</title>
+  <style>
+    :root{--max-w:920px}
+    *{box-sizing:border-box}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:18px auto;padding:18px;background:#f6f8fb;max-width:var(--max-w)}
+    header{display:flex;justify-content:flex-start;align-items:center;gap:12px;margin-bottom:14px}
+    header img{height:68px;width:68px;border-radius:50%;object-fit:cover;border:2px solid #e2e8f0;max-width:20%}
+    header h1{font-size:1.25rem;margin:0}
+    .contract{background:#fff;border:1px solid #e2e8f0;padding:18px;overflow:auto;border-radius:10px}
+    .controls {margin-top:14px;display:grid;grid-template-columns:1fr 360px;gap:14px;align-items:start}
+    label{display:block;margin-bottom:6px}
+    .sign-area{border:1px dashed #cbd5e1;padding:8px;border-radius:8px;background:#fbfdff}
+    canvas{background:#fff;border:1px solid #e2e8f0;border-radius:6px;touch-action:none;display:block;width:100%;height:auto;max-height:220px}
+    .small{font-size:0.95rem;color:#475569}
+    button{padding:10px 14px;border-radius:8px;border:0;background:#0b5cff;color:white;cursor:pointer}
+    .muted{color:#64748b;font-size:0.9rem}
+    footer{margin-top:18px;font-size:0.85rem;color:#475569}
+    input[type=text], input[type=date]{width:100%;padding:8px;border-radius:6px;border:1px solid #cbd5e1}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+
+    /* Responsive adjustments */
+    @media (max-width:860px){
+      :root{--max-w:100%}
+      body{padding:12px;margin:6px}
+      .controls{grid-template-columns:1fr;}
+      header{gap:10px}
+      header img{height:56px;width:56px}
+      .contract{padding:14px}
+      canvas{max-height:160px}
+    }
+    @media (max-width:420px){
+      header{flex-direction:row;align-items:center}
+      header div{font-size:0.95rem}
+      header img{height:48px;width:48px}
+      .actions button{flex:1}
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img id="logoImg" src="https://lh3.googleusercontent.com/KeLoukTtmSRaT5BzWzH1lhxoyzRF9nTl3SHjZFZ8A7PR-_OUm38cto0_ILD9SbnRKzAgoIkRoAuCd6GZvQ=s265-w265-h265" alt="Logo Wal Ribeiro"> 
+    <div>
+      <h1>Contrato — Wal Ribeiro Educador Físico</h1>
+      <div class="small">Leitura, escolha, assinatura (rúbrica) e exportação em PDF / WhatsApp</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="contract" id="contractText" contenteditable="false">
+      <h1 style="text-align:center">Wal Ribeiro Educador Físico</h1>
+      <h2>CONTRATO DE PRESTAÇÃO DE SERVIÇOS DE TREINAMENTO PESSOAL</h2>
+      <p><strong>Contratante:</strong> (nome do cliente — preencher no formulário)</p>
+      <p><strong>Contratado:</strong> Wal Ribeiro — Educador Físico, CPF/CNPJ: 19.312.183.0001-09 , e-mail: waleducador2025@gmail.com, WhatsApp: 34 9 8861 7229</p>
+
+      <h3>Objeto</h3>
+      <p>Prestação de serviços de treinamento personal (aulas individuais) em pacote de 12 (doze) aulas, conforme opção escolhida pelo CONTRATANTE.</p>
+
+      <h3>Opções e valores</h3>
+      <ul>
+        <li><strong>Opção 1:</strong> 12 aulas com 1 reposição por aula desmarcada — R$60,00/aula (total R$720,00)</li>
+        <li><strong>Opção 2:</strong> 12 aulas sem reposição de aula— R$50,00/aula (total R$600,00)</li>
+      </ul>
+
+      <h3>Cláusulas</h3>
+      <p><strong>1. Agendamento e Reposição.</strong> Aulas agendadas de comum acordo. Reposição conforme opção escolhida.</p>
+      <p><strong>2. Pagamento.</strong> À vista ou parcelado + taxa maquininha; atraso pode suspender atendimento.</p>
+      <p><strong>3. Obrigações do CONTRATADO.</strong> Prestar serviços com zelo técnico e sigilo.</p>
+      <p><strong>4. Obrigações do CONTRATANTE.</strong> Informar condições médicas, seguir orientações e cumprir horários.</p>
+      <p><strong>5. Rescisão.</strong> Aviso prévio de 15 dias; descumprimento permite rescisão imediata.</p>
+      <p><strong>6. Responsabilidade.</strong> CONTRATADO não responde por lesões por omissão ou negligência do CONTRATANTE.</p>
+      <p><strong>7. Tratamento de dados.</strong> Dados pessoais usados somente para execução do contrato.</p>
+
+      <p class="muted">Ao assinar, o CONTRATANTE declara ter lido, compreendido e concordado com todas as cláusulas acima.</p>
+
+      <div id="filledData" style="margin-top:18px;padding:8px;border-top:1px dashed #e2e8f0"></div>
+    </div>
+
+    <div class="controls">
+      <div>
+        <label>Escolha a opção do pacote:</label>
+        <label><input type="radio" name="option" value="Opção 1 — 12 aulas com reposição de uma aula (R$60,00)" checked> Opção 1 — 12 aulas com reposição</label>
+        <label><input type="radio" name="option" value="Opção 2 — 12 aulas sem reposição (R$50,00)"> Opção 2 — 12 aulas sem reposição</label>
+
+        <label>Nome completo:</label>
+        <input id="signerName" type="text" placeholder="Nome do cliente">
+
+        <label>CPF:</label>
+        <input id="signerCPF" type="text" placeholder="CPF do cliente">
+
+        <label>Data:</label>
+        <input id="signDate" type="date">
+
+        <label><input id="agreed" type="checkbox"> Li e concordo com os termos do contrato</label>
+      </div>
+
+      <div>
+        <label>Rúbrica (assinatura curta):</label>
+        <div class="sign-area">
+          <canvas id="sigCanvas" width="1000" height="140"></canvas>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+            <button id="clearBtn">Limpar rúbrica</button>
+            <div class="muted">Desenhe sua rúbrica com mouse ou dedo.</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button id="generateBtn">Gerar PDF e Enviar</button>
+          <button id="downloadBtn">Baixar PDF</button>
+        </div>
+
+        <div id="status" style="margin-top:12px;color:#0f172a"></div>
+      </div>
+    </div>
+
+    <footer>
+      <strong>Observações:</strong> PDF gerado com dados preenchidos e rúbrica. Funciona online e offline via CDN.
+    </footer>
+  </section>
+
+  <!-- Dependências via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    // Canvas rúbrica
+    const canvas = document.getElementById('sigCanvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    ctx.lineWidth = 2.4;
+    ctx.lineCap = 'round';
+
+    // Make the canvas responsive: base its internal pixel size on displayed CSS width and devicePixelRatio
+    function resizeCanvasForDPI() {
+      const ratio = Math.max(window.devicePixelRatio || 1, 1);
+      // desired CSS width (in px) - use parent width or a sensible default
+      const cssWidth = Math.min(1000, canvas.parentElement.clientWidth || 600);
+      const cssHeight = 140; // keep similar aspect ratio
+      // set display size (CSS)
+      canvas.style.width = cssWidth + 'px';
+      canvas.style.height = cssHeight + 'px';
+      // set actual pixel size scaled by ratio
+      canvas.width = Math.floor(cssWidth * ratio);
+      canvas.height = Math.floor(cssHeight * ratio);
+      // reset transform and scale to DPR
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.scale(ratio, ratio);
+      ctx.lineWidth = 2.4;
+      ctx.lineCap = 'round';
+    }
+    // initial resize and on orientation/resize events
+    resizeCanvasForDPI();
+    window.addEventListener('resize', () => { const imgData = canvas.toDataURL(); resizeCanvasForDPI(); // restore previous drawing if any
+      const img = new Image(); img.onload = ()=>{ ctx.drawImage(img,0,0, canvas.width/Math.max(window.devicePixelRatio||1,1), canvas.height/Math.max(window.devicePixelRatio||1,1)); }; img.src = imgData; });
+
+  function pointerDown(e){ e.preventDefault(); drawing=true; ctx.beginPath(); const p=getPos(e); ctx.moveTo(p.x,p.y);}
+  function pointerMove(e){ if(!drawing) return; e.preventDefault(); const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke();}
+  function pointerUp(e){ drawing=false;}
+  function getPos(e){ const rect=canvas.getBoundingClientRect(); const clientX = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX; const clientY = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY; const x=(clientX)-rect.left; const y=(clientY)-rect.top; return {x,y};}
+    canvas.addEventListener('mousedown',pointerDown);
+    canvas.addEventListener('mousemove',pointerMove);
+    window.addEventListener('mouseup',pointerUp);
+    canvas.addEventListener('touchstart',pointerDown);
+    canvas.addEventListener('touchmove',pointerMove);
+    window.addEventListener('touchend',pointerUp);
+  document.getElementById('clearBtn').addEventListener('click',()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); });
+
+    // Máscara CPF
+    document.getElementById('signerCPF').addEventListener('input', e=>{
+      let v=e.target.value.replace(/\D/g,'');
+      v=v.replace(/(\d{3})(\d)/,'$1.$2');
+      v=v.replace(/(\d{3})(\d)/,'$1.$2');
+      v=v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+      e.target.value=v;
+    });
+
+    function isCanvasBlank(c){ const blank=document.createElement('canvas'); blank.width=c.width; blank.height=c.height; return c.toDataURL()===blank.toDataURL();}
+
+    const generateBtn=document.getElementById('generateBtn');
+    const downloadBtn=document.getElementById('downloadBtn');
+    const whatsBtn=document.getElementById('whatsBtn');
+    const status=document.getElementById('status');
+
+    function collectFilledContractHTML(){
+      const contract=document.getElementById('contractText');
+      const opt=document.querySelector('input[name="option"]:checked').value;
+      const name=document.getElementById('signerName').value||'---';
+      const cpf=document.getElementById('signerCPF').value||'---';
+      const date=document.getElementById('signDate').value||new Date().toLocaleDateString();
+      const sigDataUrl=canvas.toDataURL('image/png');
+      const filled=document.createElement('div');
+      filled.innerHTML=`<p><strong>Opção escolhida:</strong> ${opt}</p><p><strong>Nome:</strong> ${name}</p><p><strong>CPF:</strong> ${cpf}</p><p><strong>Data:</strong> ${date}</p>`;
+      const img=document.createElement('img'); img.src=sigDataUrl; img.style.maxWidth='220px'; img.style.display='block'; img.style.marginTop='8px'; filled.appendChild(img);
+      contract.querySelector('#filledData').innerHTML=filled.innerHTML;
+      return contract;
+    }
+
+    // Função para converter imagem externa em base64
+    async function getBase64FromUrl(url) {
+      const res = await fetch(url, { mode: "cors" });
+      const blob = await res.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    async function createPdfFromElement(element){
+      status.textContent = 'Gerando PDF de texto do contrato...';
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF('p','pt','a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 40;
+      const usableWidth = pageWidth - margin * 2;
+
+      // logo no topo (primeira página) - centralizar horizontalmente
+      let logoHeight = 0;
+      let firstPageTop = 80; // default
+      try{
+        const logoSrc = document.getElementById('logoImg').src;
+        const logoData = await getBase64FromUrl(logoSrc);
+        const logoWidth = 60;
+        logoHeight = 60;
+        const centerX = (pageWidth - logoWidth) / 2;
+        pdf.addImage(logoData, 'PNG', centerX, 10, logoWidth, logoHeight);
+        firstPageTop = 10 + logoHeight + 20; // put text below the centered logo
+      }catch(e){ /* ignore logo fetch errors */ }
+
+      // Collect filled data (option, name, cpf, date)
+      const opt = (document.querySelector('input[name="option"]:checked')||{}).value || '';
+      const name = document.getElementById('signerName').value || '---';
+      const cpf = document.getElementById('signerCPF').value || '---';
+      const date = document.getElementById('signDate').value || new Date().toLocaleDateString();
+
+  // Get contract text (plain) to add as selectable text
+  // Use innerText to preserve line breaks and lists
+  const contractTextRaw = element.innerText || '';
+  const filledText = `Opção escolhida: ${opt}\nNome: ${name}\nCPF: ${cpf}\nData: ${date}\n\n`;
+  // remove any existing filledText inserted into the element to avoid duplication
+  const contractText = contractTextRaw.replace(filledText, '');
+  const fullText = contractText; // we'll append the colored option at the end separately
+
+      // Add text to PDF using jsPDF text flow
+      const fontSize = 12;
+      pdf.setFontSize(fontSize);
+      const lineHeight = fontSize * 1.25;
+
+      // split text into lines that fit the usable width
+      const lines = pdf.splitTextToSize(fullText, usableWidth);
+
+      // Calculate pagination: first page starts below logo
+  // firstPageTop may have been set above when logo was added
+      const otherPageTop = margin;
+  const firstPageLines = Math.floor((pageHeight - firstPageTop - margin) / lineHeight);
+      const otherPageLines = Math.floor((pageHeight - otherPageTop - margin) / lineHeight);
+
+      let index = 0;
+      let page = 1;
+      while (index < lines.length){
+        const top = (page === 1) ? firstPageTop : otherPageTop;
+        const maxLines = (page === 1) ? firstPageLines : otherPageLines;
+        const slice = lines.slice(index, index + maxLines);
+        pdf.text(slice, margin, top, { maxWidth: usableWidth, align: 'left' });
+        index += slice.length;
+        if (index < lines.length){ pdf.addPage(); page++; }
+      }
+
+      // After writing contract text, append the filled option in color at the end
+      try{
+        const totalPagesBeforeSig = pdf.getNumberOfPages();
+        let lastPage = totalPagesBeforeSig;
+        pdf.setPage(lastPage);
+        // compute lines per last page
+        const maxLinesLast = (lastPage === 1) ? firstPageLines : otherPageLines;
+        const usedLinesOnLast = lines.length % maxLinesLast || maxLinesLast;
+        let yOption = ((lastPage === 1) ? firstPageTop : otherPageTop) + (usedLinesOnLast * lineHeight) + 8;
+        if (yOption + 24 > pageHeight - margin) { // not enough space, create a new last page
+          pdf.addPage();
+          lastPage = pdf.getNumberOfPages();
+          pdf.setPage(lastPage);
+          yOption = otherPageTop;
+        }
+        // draw the option text in color (blue)
+        pdf.setFontSize(12);
+        pdf.setTextColor(11,92,255); // blue
+        pdf.text(`Opção escolhida: ${opt}`, margin, yOption);
+        // reset color
+        pdf.setTextColor(0,0,0);
+      }catch(e){ /* ignore option draw errors */ }
+
+      // Add signature image inside a boxed area on page 2 with caption 'Assinado!'
+      try{
+        const sigData = canvas.toDataURL('image/png');
+        let totalPages = pdf.getNumberOfPages();
+        // Ensure there is a page 2 - if not, create it
+        if (totalPages < 2) {
+          pdf.addPage();
+          totalPages = pdf.getNumberOfPages();
+        }
+        const targetPage = 2;
+        pdf.setPage(targetPage);
+
+        // Box dimensions and position (centered horizontally, near bottom)
+        const sigBoxWidth = 160;
+        const sigBoxHeight = 70;
+        const boxX = (pageWidth - sigBoxWidth) / 2;
+        const boxY = pageHeight - margin - sigBoxHeight - 30; // 30pt space for caption
+
+        // Draw rectangle (box)
+        pdf.setDrawColor(50);
+        pdf.setLineWidth(0.9);
+        pdf.rect(boxX, boxY, sigBoxWidth, sigBoxHeight);
+
+        // Place signature image inside box with small padding
+        const pad = 6;
+        const imgX = boxX + pad;
+        const imgY = boxY + pad;
+        const imgW = sigBoxWidth - pad * 2;
+        const imgH = sigBoxHeight - pad * 2;
+        pdf.addImage(sigData, 'PNG', imgX, imgY, imgW, imgH);
+
+        // Caption below the box
+        const caption = 'Assinado!';
+        pdf.setFontSize(12);
+        pdf.setTextColor(20);
+        pdf.text(caption, pageWidth / 2, boxY + sigBoxHeight + 18, { align: 'center' });
+      } catch (e) { /* ignore signature add errors */ }
+
+      return pdf;
+    }
+
+    async function sharePdfViaWhatsApp(pdf,filename){
+      const blob=pdf.output('blob');
+      const file=new File([blob],filename,{type:'application/pdf'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        try{await navigator.share({files:[file],title:'Contrato - '+filename,text:'Segue contrato assinado.'}); return {ok:true,method:'webshare'} }catch(e){ return {ok:false,message:'WebShare falhou: '+e.message}; }
+      }
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a'); a.href=url; a.download=filename; a.click();
+      const text=encodeURIComponent('Olá, envio o contrato assinado. Arquivo: '+filename+' (faça o anexo manual no WhatsApp Web)');
+      window.open('https://web.whatsapp.com/send?text='+text,'_blank');
+      return {ok:true,method:'whatsapp_web'};
+    }
+
+    generateBtn.addEventListener('click',async ()=>{
+      if(!document.getElementById('agreed').checked){ alert('É necessário concordar com os termos antes de enviar.'); return; }
+      if(isCanvasBlank(canvas)){ alert("Faça sua rúbrica antes de continuar."); return; }
+      const contractElement=collectFilledContractHTML();
+      const pdf=await createPdfFromElement(contractElement);
+      const filename=(document.getElementById('signerName').value||'contrato').replace(/\s+/g,'_')+'.pdf';
+      const res=await sharePdfViaWhatsApp(pdf,filename);
+      status.textContent=res.ok?'PDF preparado. Método: '+res.method:'Falha: '+(res.message||'desconhecido');
+    });
+
+    downloadBtn.addEventListener('click',async ()=>{
+      if(isCanvasBlank(canvas)){ alert("Faça sua rúbrica antes de baixar."); return; }
+      const contractElement=collectFilledContractHTML();
+      const pdf=await createPdfFromElement(contractElement);
+      const filename=(document.getElementById('signerName').value||'contrato').replace(/\s+/g,'_')+'.pdf';
+      pdf.save(filename);
+      status.textContent='PDF gerado e baixado localmente.';
+    });
+
+    whatsBtn.addEventListener('click',async ()=>{
+      if(!document.getElementById('agreed').checked){ alert('Concorde com os termos antes de compartilhar.'); return; }
+      if(isCanvasBlank(canvas)){ alert("Faça sua rúbrica antes de compartilhar."); return; }
+      const contractElement=collectFilledContractHTML();
+      const pdf=await createPdfFromElement(contractElement);
+      const filename=(document.getElementById('signerName').value||'contrato').replace(/\s+/g,'_')+'.pdf';
+      const res=await sharePdfViaWhatsApp(pdf,filename);
+      status.textContent=res.ok?'Operação concluída. Método: '+res.method:'Erro: '+(res.message||'não especificado');
+    });
+  </script>
+</body>
+</html>

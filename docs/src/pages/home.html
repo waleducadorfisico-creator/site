@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Página removida</title>
+  <style>
+    body{font-family:system-ui,Segoe UI,Arial,Helvetica,sans-serif;background:#f7f9fc;color:#333;margin:0;padding:26px}
+  .card{background:#fff;padding:18px 20px;border-radius:10px;box-shadow:0 6px 24px rgba(2,6,23,0.06);max-width:1200px;margin:12px auto;text-align:left}
+    a{color:#1e3a8a;text-decoration:none;font-weight:700}
+    /* category button */
+    .cat-btn{ text-align:left;padding:8px 10px;border-radius:6px;border:1px solid transparent;background:transparent;cursor:pointer }
+    .cat-btn.active{ background:#eef2ff;border-color:#c7ddff; font-weight:700 }
+    /* external gallery */
+  #gifsGallery{ margin:12px auto; max-width:1200px; display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px }
+    #gifsGallery .gifItem{ background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e6e9ee; display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start; min-height:90px }
+    #gifsGallery img{ width:100%; height:140px; object-fit:cover; display:block }
+    #gifsGallery .caption{ padding:6px 8px; font-size:0.85rem; color:#0f172a; text-align:center; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02)); }
+    /* day boxes */
+    #dayBoxes{ display:flex; gap:10px; flex-wrap:wrap; max-width:1200px; margin:18px auto; }
+  .day-box{ background:#fff;padding:6px;border-radius:8px;border:1px solid #e6e9ee; width:100%; box-sizing:border-box; height:fit-content }
+  .day-box.selected{ background:linear-gradient(180deg,#eff6ff,#eef2ff); border-color:#93c5fd }
+  /* visual while dragging over a box */
+  .day-box.drag-over{ outline:3px dashed rgba(59,130,246,0.45); outline-offset:4px }
+  /* drag handle cursor */
+  .day-item[draggable]{ cursor:grab }
+  /* thumbnail grid inside a day box */
+  .thumb-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,120px)); gap:6px; justify-content:start }
+  .thumb{ position:relative; width:120px; background:#fff;border:1px solid #eef2f7;border-radius:8px;padding:4px;display:flex;flex-direction:column;align-items:stretch;min-height:0;box-sizing:border-box }
+  .thumb img{ width:100%; height:auto; max-height:110px; object-fit:cover; border-radius:6px; display:block }
+  .thumb .meta{ padding-top:4px; text-align:center }
+  .thumb .name{ font-weight:700; font-size:0.9rem; word-break:break-word }
+  .thumb .sets{ color:#6b7280; font-size:0.8rem; margin-top:4px }
+  /* drag visuals */
+  .day-item.dragging{ opacity:0.5 }
+  .no-select{ user-select:none }
+  /* small debug bar (removed in production) */
+    /* responsive adjustments */
+    @media (max-width:1200px){
+      .card{ max-width:100%; margin:12px; }
+      #gifsGallery{ max-width:100%; grid-template-columns:repeat(auto-fill,minmax(110px,1fr)); }
+      #dayBoxes{ max-width:100%; }
+    }
+    @media (max-width:920px){
+      .card{ padding:14px; }
+      #gifsGallery .gifItem img, .thumb img { height:110px; }
+      .thumb{ width:110px }
+    }
+    /* clients panel base styles */
+    .clients-panel{ display:flex; gap:8px; align-items:center }
+    .clients-panel .client-row{ display:flex; gap:6px; align-items:center }
+  /* desktop: reduce client fields to ~half (compact) */
+  #clientNameInput, #clientsSelect{ width:80px; max-width:160px }
+    @media (max-width:640px){
+      body{ padding:14px }
+      .card{ padding:12px }
+      #gifsGallery{ grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:8px }
+      #gifsGallery .gifItem img, .thumb img { height:84px; }
+      .thumb{ width:90px }
+      /* make controls stack on mobile */
+      .card > div:first-child{ flex-direction:column; align-items:flex-start }
+      /* header controls container: stack its internal groups and allow wrapping */
+      .card > div:first-child > div:nth-child(2){ display:flex; flex-direction:column; gap:8px; align-items:stretch }
+      /* when stacked, keep the inner control rows flexible and wrapped */
+      .card > div:first-child > div:nth-child(2) .clients-panel,
+      .card > div:first-child > div:nth-child(2) [style*="display:flex"]{ display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+      /* ensure small controls (sets input, category button) don't overflow */
+      #setsInput{ width:auto; min-width:56px }
+      #openCategoriesBtn, #openDaysBtn{ white-space:nowrap }
+      /* clients panel: stack and expand inputs/select on small screens */
+      .clients-panel{ flex-direction:column; align-items:stretch; margin-right:0; width:100% }
+      .clients-panel .client-row{ width:100%; gap:8px }
+  .clients-panel input#clientNameInput, .clients-panel select#clientsSelect{ width:100%; max-width:none }
+      /* avoid forcing full-width on clients' buttons - keep them naturally sized */
+  .clients-panel button{ width:auto !important }
+  /* only make the bottom action buttons full-width on mobile, not header controls */
+  .card > div:nth-child(2) a, .card > div:nth-child(2) button{ width:100%; }
+      #openDaysBtn{ width:auto }
+      #setsInput{ min-width:48px; width:48px }
+      .exercise{ flex-direction:row; }
+    }
+
+    /* further tighten small-screen thumb/gallery layout to avoid overflow */
+    @media (max-width:480px){
+      #gifsGallery{ grid-template-columns:repeat(auto-fill,minmax(80px,1fr)); gap:6px }
+      .thumb{ width:80px }
+      #gifsGallery .gifItem, .thumb{ text-align:center }
+      #gifsGallery .caption, .thumb .name, .thumb .sets{ white-space:normal; overflow-wrap:break-word; word-break:break-word }
+      #gifsGallery .caption, .thumb .name{ font-size:0.78rem }
+      .thumb .sets{ font-size:0.72rem; color:#6b7280 }
+      .thumb .meta{ display:flex; flex-direction:column; align-items:center; gap:4px; padding-top:4px }
+      /* ensure the sets badge doesn't overflow the thumb */
+      .thumb .sets{ max-width:72px; text-align:center }
+      /* small image height to keep layout compact */
+      #gifsGallery .gifItem img, .thumb img { height:72px }
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="card" id="mainCard">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <h1 style="margin:0 0 6px 0">Página de Treinos</h1>
+        <div style="color:#6b7280;font-size:0.95rem">Escolha uma categoria e um dia para visualizar os GIFs.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+          <!-- Client management: create/select client, save/load last treino -->
+          <div class="clients-panel" style="margin-right:8px">
+            <div class="client-row">
+              <input id="clientNameInput" placeholder="Nome do cliente" style="padding:6px 8px;border-radius:6px;border:1px solid #e5e7eb;min-width:72px;font-size:0.95rem" />
+              <button id="addClientBtn" style="padding:6px 10px;border-radius:6px;border:1px solid #d1d5db;background:#fff;cursor:pointer">Criar/Selecionar</button>
+            </div>
+            <div class="client-row">
+              <select id="clientsSelect" style="padding:6px 8px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;min-width:72px"></select>
+              <button id="saveClientBtn" style="padding:6px 10px;border-radius:6px;border:1px solid #c7ddff;background:#eef6ff;cursor:pointer">Salvar treino</button>
+              <button id="loadClientBtn" style="padding:6px 10px;border-radius:6px;border:1px solid #94a3b8;background:#fff;color:#0f172a;cursor:pointer">Carregar último</button>
+            </div>
+          </div>
+          <div style="position:relative;display:flex;align-items:center;gap:8px">
+          <button id="openDaysBtn" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;background:#fff;cursor:pointer">Dia: Todos ▾</button>
+          <div style="display:flex;align-items:center;gap:8px">
+            <input id="setsInput" placeholder="ex: 3x12 ou 25min" style="padding:6px 8px;border-radius:6px;border:1px solid #e5e7eb;min-width:40px;width:40px;font-size:0.95rem" />
+          </div>
+          <div id="daysDropdown" style="display:none;position:absolute;top:40px;left:0;min-width:160px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 6px 28px rgba(2,6,23,0.08);padding:8px;z-index:999">
+            <div id="daysList" style="display:flex;flex-direction:column;gap:6px"></div>
+          </div>
+        </div>
+
+        <div style="position:relative">
+          <button id="openCategoriesBtn" style="padding:8px 12px;border-radius:8px;border:1px solid #d1d5db;background:#fff;cursor:pointer">Categorias ▾</button>
+          <div id="categoriesDropdown" style="display:none;position:absolute;top:40px;left:0;min-width:300px;max-width:640px;max-height:420px;overflow:auto;background:#fff;border:1px solid #e5e7eb;border-radius:8px;box-shadow:0 6px 28px rgba(2,6,23,0.08);padding:12px;z-index:999">
+              <div id="categoriesList" style="display:flex;flex-direction:column;gap:6px"></div>
+              <hr style="margin:8px 0">
+              <div style="color:#6b7280;font-size:0.9rem">As imagens aparecerão aqui, fora do menu.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-top:16px; border-top:1px solid #eef2f7; padding-top:14px; display:flex; align-items:center; gap:12px">
+  <a href="/index.html" style="margin-right:8px">Voltar ao portal</a>
+  <button id="previewBtn" style="padding:8px 14px;border-radius:8px;border:1px solid #94a3b8;background:#eef2ff;color:#0f172a;cursor:pointer">Pré-visualizar Player</button>
+  <button id="exportBtn" style="padding:8px 14px;border-radius:8px;border:1px solid #93c5fd;background:#f1f5ff;color:#1e3a8a;cursor:pointer;font-weight:600">Exportar Treino (HTML)</button>
+    </div>
+    
+  </div>
+
+  <!-- galeria externa: imagens aparecem fora do dropdown quando uma categoria é selecionada -->
+  <div id="gifsGallery" aria-live="polite"></div>
+
+  <!-- Boxes por dia: onde os treinos atribuídos serão exibidos -->
+  <div id="dayBoxes" style="max-width:920px;margin:18px auto;display:flex;flex-direction:column;position:relative;gap:18px;align-items:stretch"></div>
+
+
+  <script type="module">
+  (function(){
+    // Ensure we're using the correct path for categories.json and images
+    const pathname = window.location.pathname || '';
+    const base = pathname.includes('/site-main') ? '/site-main/docs' : '/docs';
+    const PUBLIC_PREFIX = (base + '/public').replace(/\/\//g, '/');
+    console.log('Base path:', base);
+    console.log('Public prefix:', PUBLIC_PREFIX);
+
+    // debug bar removed in production build
+
+    const btn = document.getElementById('openCategoriesBtn');
+    const dropdown = document.getElementById('categoriesDropdown');
+    const list = document.getElementById('categoriesList');
+    const gallery = document.getElementById('gifsGallery');
+    let categories = null;
+    let activeCategory = null;
+    const setsInput = document.getElementById('setsInput');
+    // load persisted sets value
+    try{ const saved = localStorage.getItem('gifs_sets'); if(saved) setsInput.value = saved; }catch(e){}
+
+    function toggleDropdown(show){ dropdown.style.display = (show ? 'block' : 'none'); }
+    btn.addEventListener('click', async ()=>{
+      const visible = dropdown.style.display !== 'none';
+      if(visible){ toggleDropdown(false); return; }
+      // open: load categories using resilient loader
+      try{
+        await loadCategories();
+      }catch(e){
+        console.error('Erro ao carregar categories module', e);
+        list.innerHTML = '<div style="color:#b91c1c">Erro ao carregar categorias.</div>';
+        toggleDropdown(true);
+        return;
+      }
+
+      // populate categories list
+      list.innerHTML = '';
+      Object.keys(categories).forEach(cat=>{
+        const item = document.createElement('button');
+        item.textContent = cat; // No need to capitalize first letter as names are already formatted
+        item.className = 'cat-btn';
+        item.addEventListener('click', ()=> showCategory(cat, item));
+        list.appendChild(item);
+      });
+
+  // clear external gallery initially
+  gallery.innerHTML = '';
+      toggleDropdown(true);
+    });
+
+    // show gifs for category
+    function showCategory(cat, btnEl){
+      // mark active button
+      activeCategory = cat;
+      list.querySelectorAll('.cat-btn').forEach(b=> b.classList.remove('active'));
+      try{ if(btnEl) btnEl.classList.add('active'); }catch(e){}
+
+      // populate external gallery
+      gallery.innerHTML = '';
+      console.log('Showing category:', cat);
+      console.log('Current categories:', categories);
+      const files = (categories && categories[cat]) || [];
+      console.log('Files for category:', files);
+      if(!files || files.length === 0){ 
+        gallery.innerHTML = '<div style="padding:8px;color:#666">Nenhum GIF encontrado</div>'; 
+        console.error('No files found for category:', cat);
+        return; 
+      }
+      // persist sets value on change
+      if(setsInput){ setsInput.addEventListener('input', (e)=>{ try{ localStorage.setItem('gifs_sets', e.target.value || ''); }catch(ex){} }); }
+      files.forEach(f=>{
+        const wrapper = document.createElement('div'); wrapper.className = 'gifItem';
+        const img = document.createElement('img');
+        const src = (PUBLIC_PREFIX + '/treinos/' + encodeURIComponent(cat) + '/' + encodeURIComponent(f)).replace(/%2F/g, '/');
+        img.src = src; img.alt = f;
+        // friendly name (strip extension, replace underscores/dashes with spaces, capitalize)
+        const friendly = (f || '').replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').replace(/\s+/g,' ').trim();
+        const friendlyLabel = friendly.split(' ').map(s=> s.charAt(0).toUpperCase()+s.slice(1)).join(' ');
+        // click: if a day is selected, add this gif to that day with the current sets value; otherwise open raw gif
+        img.addEventListener('click', (ev)=>{
+          ev.stopPropagation();
+          const currentSets = (setsInput && setsInput.value) ? setsInput.value.trim() : '';
+          if(selectedDay){ addGifToDay(selectedDay, { categoria: cat, file: f, sets: currentSets }); renderDayBoxes(); }
+          else { window.open(src, '_blank'); }
+        });
+        wrapper.appendChild(img);
+        const previewSets = (setsInput && setsInput.value) ? setsInput.value.trim() : '';
+        if(previewSets){ const caption = document.createElement('div'); caption.className='caption'; caption.textContent = previewSets; wrapper.appendChild(caption); }
+        // always show the friendly name under the image
+        const nameEl = document.createElement('div'); nameEl.className = 'caption'; nameEl.style.fontWeight = '700'; nameEl.style.marginTop = '6px'; nameEl.textContent = friendlyLabel;
+        wrapper.appendChild(nameEl);
+        gallery.appendChild(wrapper);
+      });
+      // add 'Adicionar todos ao dia' button
+      if(selectedDay){
+        const addAllBtn = document.createElement('button'); addAllBtn.textContent = 'Adicionar todos ao dia ' + selectedDay; addAllBtn.style.cssText = 'display:block;margin:10px 0;padding:8px 10px;border-radius:8px;border:1px solid #c7ddff;background:#eef6ff;cursor:pointer';
+        addAllBtn.addEventListener('click', ()=>{ const currentSets = (setsInput && setsInput.value) ? setsInput.value.trim() : ''; files.forEach(f=> addGifToDay(selectedDay, { categoria: cat, file: f, sets: currentSets })); renderDayBoxes(); });
+        gallery.insertBefore(addAllBtn, gallery.firstChild);
+      }
+      // close dropdown after selection
+      toggleDropdown(false);
+    }
+
+    // click outside to close categories dropdown
+    document.addEventListener('click', (e)=>{
+      if(!dropdown) return;
+      if(dropdown.contains(e.target) || btn.contains(e.target)) return;
+      toggleDropdown(false);
+    });
+
+    // load categories directly from categories.json only
+    async function loadCategories(){
+      categories = null; // Reset categories to force reload
+      try {
+        const p = (PUBLIC_PREFIX + '/categories.json').replace(/\/\//g, '/');
+        console.log('Loading categories from:', p);
+        const rj = await fetch(p, { 
+          cache: 'no-store',  // Prevent caching
+          headers: { 'Cache-Control': 'no-cache' }
+        });
+        if(!rj.ok) {
+          console.error('Failed to fetch categories.json:', rj.status, rj.statusText);
+          throw new Error('Failed to fetch categories.json');
+        }
+        const j = await rj.json(); 
+        if (!j || !j.categories) {
+          console.error('Invalid categories.json format:', j);
+          throw new Error('Invalid categories format');
+        }
+        // Convert categories array to object format
+        const categoriesObj = {};
+        j.categories.forEach(cat => {
+          categoriesObj[cat.name] = cat.exercises;
+        });
+        categories = categoriesObj;
+        console.log('Loaded categories:', Object.keys(categories));
+        return categories;
+      } catch(e) {
+        console.error('Error loading categories:', e);
+        throw new Error('Categories not found');
+      }
+      let lastErr = null;
+      for(const cand of candidates){
+        try{ const mod = await import(cand); if(mod && mod.categories){ categories = mod.categories; return categories; } }catch(err){ lastErr = err; }
+      }
+      // try fetch+eval of JS file
+      for(const cand of candidates){
+        try{
+          const r = await fetch(cand);
+          if(!r.ok) continue;
+          const txt = await r.text();
+          if(/\bcategories\b/.test(txt)){
+            try{
+              const wrapper = `(function(){ let categories = {}; ${txt}; return typeof categories !== 'undefined' ? categories : (typeof window !== 'undefined' && window.categories) ? window.categories : {}; })()`;
+              const res = eval(wrapper);
+              if(res && Object.keys(res).length){ categories = res; return categories; }
+            }catch(e){ lastErr = e; }
+          }
+        }catch(e){ lastErr = e; }
+      }
+      // try public JSON fallback
+      try{
+        const p = (PUBLIC_PREFIX + '/categories.json').replace(/\/\//g, '/');
+        const rj = await fetch(p);
+        if(rj.ok){ const j = await rj.json(); categories = j; return categories; }
+      }catch(e){ lastErr = lastErr || e; }
+      throw lastErr || new Error('categories not found');
+    }
+
+    // --- Days of week dropdown ---
+    const daysBtn = document.getElementById('openDaysBtn');
+    const daysDropdown = document.getElementById('daysDropdown');
+    const daysList = document.getElementById('daysList');
+    const diasSemana = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+    let selectedDay = null; // null => Todos
+
+    function toggleDays(show){ daysDropdown.style.display = (show ? 'block' : 'none'); }
+    daysBtn.addEventListener('click', ()=>{ const v = daysDropdown.style.display !== 'none'; if(v) toggleDays(false); else { toggleDays(true); } });
+
+    // populate days
+    diasSemana.forEach(d=>{
+      const b = document.createElement('button'); b.textContent = d; b.style.cssText = 'text-align:left;padding:6px 8px;border-radius:6px;border:0;background:transparent;cursor:pointer';
+      b.addEventListener('click', ()=>{ selectedDay = d; daysBtn.textContent = 'Dia: ' + d + ' ▾'; toggleDays(false); /* optional: you can filter gifs here if gifs are tagged by day */ renderDayBoxes(); });
+      daysList.appendChild(b);
+    });
+
+    // --- Client management (save/load last treino) ---
+    const clientNameInput = document.getElementById('clientNameInput');
+    const addClientBtn = document.getElementById('addClientBtn');
+    const clientsSelect = document.getElementById('clientsSelect');
+    const saveClientBtn = document.getElementById('saveClientBtn');
+    const loadClientBtn = document.getElementById('loadClientBtn');
+
+    function loadClients(){ try{ return JSON.parse(localStorage.getItem('clients_list')||'[]'); }catch(e){ return []; } }
+    function saveClients(list){ try{ localStorage.setItem('clients_list', JSON.stringify(list)); }catch(e){} }
+    function refreshClientsUI(){ const list = loadClients(); clientsSelect.innerHTML = ''; const empty = document.createElement('option'); empty.value=''; empty.textContent='-- selecionar cliente --'; clientsSelect.appendChild(empty); list.forEach(name=>{ const o = document.createElement('option'); o.value = name; o.textContent = name; clientsSelect.appendChild(o); }); }
+
+    addClientBtn.addEventListener('click', ()=>{
+      const name = (clientNameInput.value||'').trim();
+      // If no name entered: show the saved clients list to choose from
+      if(!name){
+        const list = loadClients();
+        if(!list || list.length === 0){ return alert('Nenhum cliente salvo'); }
+        refreshClientsUI();
+        // expand the select into a listbox so names appear
+        clientsSelect.size = Math.min(8, list.length);
+        clientsSelect.focus();
+        return;
+      }
+
+      // otherwise create/select the provided name
+      const list = loadClients(); if(!list.includes(name)) { list.push(name); saveClients(list); }
+      refreshClientsUI(); clientsSelect.value = name; clientNameInput.value = '';
+      // collapse select if it was expanded
+      try{ clientsSelect.size = 1; }catch(e){}
+      // attempt to auto-load last saved treino for new/existing client
+      try{ const key = 'client_last_' + name; const raw = localStorage.getItem(key); if(raw){ const parsed = JSON.parse(raw||'{}'); if(parsed && typeof parsed === 'object'){ localStorage.setItem('assignments', JSON.stringify(parsed)); renderDayBoxes(); } } }catch(e){}
+    });
+
+    // collapse the select back to normal when user picks a client
+    clientsSelect.addEventListener('change', ()=>{ try{ clientsSelect.size = 1; }catch(e){} });
+    // also collapse when clicking outside the select (prevents 'appear and disappear' issues on some hosts)
+    document.addEventListener('click', (ev)=>{
+      try{
+        const expanded = (clientsSelect.size && clientsSelect.size > 1);
+        if(!expanded) return;
+        const target = ev.target;
+        if(target === clientsSelect || clientsSelect.contains(target) || target === addClientBtn) return;
+        clientsSelect.size = 1;
+      }catch(e){}
+    });
+
+    saveClientBtn.addEventListener('click', ()=>{
+      const name = (clientsSelect.value||'').trim(); if(!name) return alert('Selecione um cliente para salvar');
+      try{
+        const data = loadAssignments(); // current assignments
+        const key = 'client_last_' + name;
+        localStorage.setItem(key, JSON.stringify(data));
+        alert('Treino salvo para ' + name);
+      }catch(e){ console.error('save client', e); alert('Erro ao salvar treino'); }
+    });
+
+    loadClientBtn.addEventListener('click', ()=>{
+      const name = (clientsSelect.value||'').trim(); if(!name) return alert('Selecione um cliente para carregar');
+      try{
+        const key = 'client_last_' + name; const raw = localStorage.getItem(key);
+        if(!raw) return alert('Nenhum treino salvo para ' + name);
+        const parsed = JSON.parse(raw);
+        if(parsed && typeof parsed === 'object'){ localStorage.setItem('assignments', JSON.stringify(parsed)); renderDayBoxes(); alert('Treino carregado para ' + name); }
+      }catch(e){ console.error('load client', e); alert('Erro ao carregar'); }
+    });
+
+    // initialize clients UI on load
+    refreshClientsUI();
+
+  // --- Day boxes management ---
+    const dayBoxes = document.getElementById('dayBoxes');
+  // colors for days (by label). If you want other colors, adjust here.
+  const dayColors = { 'Dom':'#f97316','Seg':'#ef4444','Ter':'#f59e0b','Qua':'#10b981','Qui':'#06b6d4','Sex':'#3b82f6','Sáb':'#8b5cf6' };
+    // load assignments from storage: { Dom: [{categoria,file,sets}, ...], Seg: [...] }
+    function loadAssignments(){ try{ return JSON.parse(localStorage.getItem('assignments')||'{}'); }catch(e){ return {}; } }
+    function saveAssignments(obj){ try{ localStorage.setItem('assignments', JSON.stringify(obj)); }catch(e){} }
+    function addGifToDay(day, payload){ const all = loadAssignments(); if(!all[day]) all[day]=[]; // avoid duplicates
+      const exists = all[day].some(it=> it.categoria===payload.categoria && it.file===payload.file );
+      if(!exists) { all[day].push(payload); saveAssignments(all); }
+    }
+    // move an item from one day/index to another day/index (or reorder within same day)
+    function moveGif(fromDay, fromIndex, toDay, toIndex){ const all = loadAssignments(); if(!all[fromDay]) return; const item = all[fromDay].splice(fromIndex,1)[0]; if(!item) return; if(!all[toDay]) all[toDay]=[]; if(typeof toIndex === 'number') all[toDay].splice(toIndex,0,item); else all[toDay].push(item); saveAssignments(all); }
+    function removeGifFromDay(day, index){ const all = loadAssignments(); if(!all[day]) return; all[day].splice(index,1); saveAssignments(all); renderDayBoxes(); }
+
+    function stripExt(name){ return name.replace(/\.[^.]+$/, ''); }
+
+  function renderDayBoxes(){ dayBoxes.innerHTML = ''; const all = loadAssignments();
+      // render only the selected day (first) then other days that already have assignments
+      const assignedDays = Object.keys(all).filter(k=> (all[k]||[]).length>0 );
+      let daysToRender = [];
+      if(selectedDay){ daysToRender.push(selectedDay); assignedDays.forEach(d=>{ if(d !== selectedDay) daysToRender.push(d); }); }
+      else { daysToRender = assignedDays; }
+      daysToRender = Array.from(new Set(daysToRender));
+      daysToRender.forEach((d, idx)=>{
+        const box = document.createElement('div'); box.className = 'day-box' + (d===selectedDay ? ' selected' : '');
+        // add a color stripe on the left
+        const color = dayColors[d] || '#93c5fd';
+        box.style.position = 'relative';
+    const stripe = document.createElement('div'); stripe.style.cssText = `position:absolute;right:0;top:0;bottom:0;width:6px;background:${color};border-radius:0 8px 8px 0`;
+        box.appendChild(stripe);
+
+    const title = document.createElement('div'); title.style.cssText='font-weight:700;margin-bottom:6px;margin-right:10px;text-align:right'; title.textContent = d;
+  // vertical layout: no translateY offset (stacked)
+  box.style.transform = 'none';
+        box.appendChild(title);
+  const listEl = document.createElement('div'); listEl.className = 'thumb-grid'; listEl.style.cssText='padding-left:6px;padding-right:12px';
+  listEl.dataset.day = d; // for drop target
+        // enable dropping on the list container
+        listEl.addEventListener('dragover', (ev)=>{
+          ev.preventDefault();
+          box.classList.add('drag-over');
+          // indicate insertion point (we'll compute on drop)
+        });
+        listEl.addEventListener('dragleave', ()=>{ box.classList.remove('drag-over'); });
+        listEl.addEventListener('drop', (ev)=>{
+          ev.preventDefault(); box.classList.remove('drag-over');
+          try{
+            const payload = JSON.parse(ev.dataTransfer.getData('application/json'));
+            const fromDay = payload.day; const fromIndex = payload.index;
+            // compute target index based on drop position
+            const children = Array.from(listEl.querySelectorAll('.thumb'));
+            let toIndex = children.length; // default append
+            const rects = children.map(c=> c.getBoundingClientRect());
+            for(let i=0;i<rects.length;i++){
+              const r = rects[i];
+              if(ev.clientY < (r.top + r.height/2)) { toIndex = i; break; }
+            }
+            moveGif(fromDay, fromIndex, d, toIndex);
+            renderDayBoxes();
+          }catch(e){ console.error('drop error', e); }
+        });
+
+        const items = all[d] || [];
+        items.forEach((it, idx)=>{
+          const card = document.createElement('div'); card.className = 'thumb';
+          card.draggable = true; card.dataset.index = idx; card.dataset.day = d;
+          // dragstart payload
+          card.addEventListener('dragstart', (ev)=>{
+            ev.dataTransfer.effectAllowed = 'move';
+            ev.dataTransfer.setData('application/json', JSON.stringify({ day: d, index: idx }));
+            try{ const crt = card.cloneNode(true); crt.style.position='absolute'; crt.style.top='-1000px'; document.body.appendChild(crt); ev.dataTransfer.setDragImage(crt,20,20); setTimeout(()=> document.body.removeChild(crt),0); }catch(e){}
+          });
+
+          const img = document.createElement('img'); img.src = (PUBLIC_PREFIX + '/treinos/' + encodeURIComponent(it.categoria) + '/' + encodeURIComponent(it.file)).replace(/%2F/g, '/');
+          const meta = document.createElement('div'); meta.className='meta';
+          const name = document.createElement('div'); name.className='name'; name.textContent = stripExt(it.file);
+          const sets = document.createElement('div'); sets.className='sets'; sets.textContent = it.sets || '';
+          const rm = document.createElement('button'); rm.textContent='✖'; rm.style.cssText='position:absolute;left:8px;top:8px;background:transparent;border:0;color:#9ca3af;cursor:pointer;padding:2px'; rm.addEventListener('click', (e)=>{ e.stopPropagation(); removeGifFromDay(d, idx); });
+          card.appendChild(img); meta.appendChild(name); meta.appendChild(sets); card.appendChild(meta); card.appendChild(rm);
+          listEl.appendChild(card);
+        });
+        box.appendChild(listEl); dayBoxes.appendChild(box);
+      }); }
+
+    // initial render of day boxes
+    renderDayBoxes();
+
+    // click outside to close days dropdown
+    document.addEventListener('click', (e)=>{
+      if(!daysDropdown) return;
+      if(daysDropdown.contains(e.target) || daysBtn.contains(e.target)) return;
+      toggleDays(false);
+    });
+
+    // --- Export function (client-side, converte imagens para data URLs e baixa um HTML autocontido) ---
+    async function exportTreinoHTML({ preview=false } = {}){
+      const eb = document.getElementById('exportBtn');
+      const prevLabel = eb ? eb.textContent : null;
+      try{
+        if(eb && !preview){ eb.disabled = true; eb.textContent = 'Exportando...'; }
+        const assignments = loadAssignments();
+        // order days starting from Monday
+        const order = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+        const diasPresentes = Object.keys(assignments).filter(dia => assignments[dia] && assignments[dia].length > 0);
+        const dias = order.concat(diasPresentes.filter(d=> !order.includes(d))).filter(d=> diasPresentes.includes(d));
+        if(dias.length === 0){ alert('Nenhum exercício atribuído.'); return; }
+        // We'll create one HTML file per day. For each day we build the same template but only include that day's exercises.
+        const generated = [];
+        for(const dia of dias){
+          let html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Treino - ${dia}</title><style>:root{ --neon:#39ff14; --bg:#000; }body{ background:var(--bg); color:var(--neon); font-family: Arial, Helvetica, sans-serif; margin:0; padding:20px; } .container{ max-width:980px; margin:0 auto; } h1{ color:var(--neon); margin-bottom:18px; } .exercise{ display:flex; align-items:center; gap:16px; padding:12px; margin-bottom:12px; border:1px solid var(--neon); border-left:8px solid var(--neon); border-radius:6px; background:rgba(57,255,20,0.02); flex-wrap:wrap; } .exercise img{ width:125px; height:125px; max-width:125px; max-height:125px; object-fit:cover; border-radius:6px; flex:0 0 125px; } .sets-ref{ color:#ffffff; font-weight:700; margin:0 12px; align-self:center; text-align:center; min-width:60px; } .ex-info{ display:flex; flex-direction:column; gap:8px; flex:1; min-width:0; align-items:flex-start; } .meta-row{ display:flex; align-items:center; gap:8px; margin-top:4px; } .ex-name{ flex:1; } .sets-ref{ color:#ffffff; font-weight:700; margin:0 6px; text-align:center; min-width:56px; display:inline-flex; align-items:center; justify-content:center; padding:2px 6px; border-radius:4px; background:rgba(255,255,255,0.04); } .load-input{ min-width:20px; max-width:40px; width:auto; background:#fff; color:#000; border-radius:3px; border:1px solid #ccc; padding:1px 4px; text-align:center; font-weight:700; font-size:0.85rem; margin:0 6px; } .ex-name{ color:var(--neon); font-weight:700; font-size:1.05rem; word-break:break-word; overflow-wrap:anywhere; white-space:normal; align-self:flex-start; } .ex-detail{ color:#ffffff; opacity:0.95; align-self:flex-start; } .small-meta{ color:rgba(255,255,255,0.7); font-size:0.9rem; } .timer-btn{ background:transparent; color:var(--neon); border:1px solid var(--neon); width:120px; height:120px; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size: 24px; font-weight: bold; } .timer-btn[disabled]{ opacity:1; cursor:default; font-size: 36px; } .exercise.completed{ background: rgba(255,80,80,0.12); border-color: #ff4d4d; } .exercise.completed .timer-btn{ background: #ff4d4d; color: #fff; border-color:#ff4d4d; font-size: 24px; } .ex-info * { min-width: 0; } @media (max-width:640px){ .exercise{ flex-direction:row; align-items:center; gap:10px; padding:8px; } .exercise img{ width:83px; height:83px; max-width:83px; max-height:83px; flex:0 0 83px; } .ex-info{ width:calc(100% - 97px); } .ex-name{ font-size:1rem; } .ex-detail{ font-size:0.95rem; } .timer-btn { width: 100px; height: 100px; font-size: 20px; } .timer-btn[disabled] { font-size: 28px; }} }</style></head><body><div class="container"><h1>Treino - ${dia}</h1><div id="exercises">`;
+
+          // build content only for this day
+          for(const ex of assignments[dia]){
+            const src = `${PUBLIC_PREFIX}/treinos/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
+            let dataUrl = src;
+            try{
+              const resp = await fetch(src);
+              if(resp.ok){ const blob = await resp.blob(); dataUrl = await new Promise(res => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(blob); }); }
+            }catch(e){ console.warn('Não foi possível embutir', src, e); }
+
+            // detect sets / time from ex.sets
+            let isTimed = false; let secondsForBtn = 60; let setsLabel = ex.sets || '';
+            try{
+              const detalhe = (ex.sets||'').toString();
+              const tm = detalhe.match(/(\d+)\s*(?:min(?:uto)?s?)/i);
+              if(tm){ isTimed = true; secondsForBtn = parseInt(tm[1],10) * 60; setsLabel = tm[1] + (tm[1]==='1' ? ' minuto' : ' minutos'); }
+              else {
+                const s = detalhe.match(/(\d+)\s*[x×]\s*(\d+)/);
+                if(s){ setsLabel = s[1] + 'x' + s[2]; }
+              }
+            }catch(e){ }
+
+            const cleanedName = stripExt(ex.file);
+            const btnLabel = isTimed ? 'Concluir' : ('Iniciar ' + secondsForBtn + 's');
+            html += '<div class="exercise" data-ex="'+ cleanedName + '" data-sets="'+ (isTimed?0: (ex.sets||'')) + '" data-timed="'+ (isTimed? 'true':'false') + '">';
+            html += '<img src="'+ dataUrl +'" alt="'+ cleanedName + '">';
+            html += '<div class="ex-info"><div class="ex-name">'+ cleanedName +'</div><div class="meta-row"><div class="sets-ref">'+ setsLabel + '</div><input class="load-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="kg"></div><div class="ex-detail">'+ (ex.sets||'') +'</div></div>';
+            html += '<div class="controls"><button class="timer-btn" data-seconds="'+ secondsForBtn + '">'+ btnLabel +'</button><div class="timer-display"></div></div></div>';
+          }
+
+          // append script (same logic as in provided template)
+          html += `</div></div><script>(function(){function formatTime(s){ const m = Math.floor(s/60); const sec = s%60; return (m>0?m+':':'') + (sec<10?('0'+sec):sec); }document.querySelectorAll('.exercise').forEach(card=>{const btn = card.querySelector('.timer-btn'); const setsDisplay = card.querySelector('.sets-ref'); const loadInput = card.querySelector('.load-input'); let sets = parseInt(card.dataset.sets||'3',10); let secondsDefault = parseInt(btn.dataset.seconds||'60',10); let interval = null; btn.textContent = (card.dataset.timed==='true')? 'Concluir' : ('Iniciar ' + secondsDefault + 's'); function updateSetsUI(){ if(setsDisplay) setsDisplay.textContent = sets + (card.dataset.reps?('x'+card.dataset.reps):''); } try{ if(loadInput){ const key = 'treino_load_' + (card.dataset.ex || card.getAttribute('data-ex')); const saved = localStorage.getItem(key); if(saved) loadInput.value = saved; loadInput.addEventListener('input', e=>{ const v = (e.target.value||'').replace(/[^0-9]/g,'').slice(0,4); e.target.value = v; if(v) localStorage.setItem(key, v); else localStorage.removeItem(key); }); } }catch(e){} updateSetsUI(); btn.addEventListener('click', ()=>{ if(btn.disabled) return; const isTimed = card.dataset.timed === 'true'; if(isTimed){ sets = 0; updateSetsUI(); card.classList.add('completed'); btn.textContent = 'Concluído'; btn.disabled = true; return; } let remaining = secondsDefault; btn.disabled = true; btn.textContent = formatTime(remaining); interval = setInterval(()=>{ remaining--; if(remaining<=0){ clearInterval(interval); interval=null; sets = Math.max(0, sets-1); updateSetsUI(); if(sets === 0){ card.classList.add('completed'); btn.textContent = 'Concluído'; btn.disabled = true; } else { btn.disabled = false; btn.textContent = 'Iniciar ' + secondsDefault + 's'; } } else { btn.textContent = formatTime(remaining); } }, 1000); }); });})();<\/script></body></html>`;
+
+          generated.push({ day: dia, html });
+        }
+
+        // download each generated file sequentially; preview opens the first available
+        let firstUrl = null;
+        for(const g of generated){
+          const blob = new Blob([g.html], { type:'text/html' });
+          const url = URL.createObjectURL(blob);
+          // trigger download
+          const a = document.createElement('a'); a.style.display='none'; a.href = url; a.download = `treino_${g.day}.html`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+          if(!firstUrl) firstUrl = url;
+          // revoke after short delay to allow download to start
+          setTimeout(()=> URL.revokeObjectURL(url), 2000);
+        }
+        if(preview && firstUrl){ window.open(firstUrl, '_blank'); }
+
+        const blob = new Blob([html], { type:'text/html' });
+        const url = URL.createObjectURL(blob);
+        if(preview){ window.open(url, '_blank'); setTimeout(()=>URL.revokeObjectURL(url), 20000); }
+        else { const a = document.createElement('a'); a.style.display='none'; a.href = url; a.download = 'treino_exportado.html'; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=> URL.revokeObjectURL(url), 500); }
+      }catch(err){ console.error('Erro no exportTreinoHTML', err); alert('Erro durante a exportação. Veja o console para detalhes.'); }
+      finally{ if(eb && !preview){ eb.disabled = false; eb.textContent = prevLabel || 'Exportar Treino (HTML)'; } }
+    }
+
+    // wire export button
+  try{ const eb = document.getElementById('exportBtn'); if(eb) eb.addEventListener('click', ()=> exportTreinoHTML({preview:false})); const pb = document.getElementById('previewBtn'); if(pb) pb.addEventListener('click', ()=> exportTreinoHTML({preview:true})); }catch(e){}
+  })();
+  </script>
+</body>
+</html>
