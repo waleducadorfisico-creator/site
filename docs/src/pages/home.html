@@ -226,7 +226,7 @@ const PUBLIC_PREFIX = (base + '/docs/public').replace(/\/\//g, '/');
       files.forEach(f=>{
         const wrapper = document.createElement('div'); wrapper.className = 'gifItem';
         const img = document.createElement('img');
-        const src = (PUBLIC_PREFIX + '/treinos/' + encodeURIComponent(cat) + '/' + encodeURIComponent(f)).replace(/%2F/g, '/');
+        const src = (PUBLIC_PREFIX + '/Treinos/' + encodeURIComponent(cat) + '/' + encodeURIComponent(f)).replace(/%2F/g, '/');
         img.src = src; img.alt = f;
         // friendly name (strip extension, replace underscores/dashes with spaces, capitalize)
         const friendly = (f || '').replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').replace(/\s+/g,' ').trim();
@@ -582,5 +582,6 @@ const PUBLIC_PREFIX = (base + '/docs/public').replace(/\/\//g, '/');
   </script>
 </body>
 </html>
+
 
 
