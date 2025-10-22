@@ -226,8 +226,9 @@
       files.forEach(f=>{
         const wrapper = document.createElement('div'); wrapper.className = 'gifItem';
         const img = document.createElement('img');
-        const src = (PUBLIC_PREFIX + '/Treinos/' + encodeURIComponent(cat) + '/' + encodeURIComponent(f)).replace(/%2F/g, '/');
-        img.src = src; img.alt = f;
+        const src = `${PUBLIC_PREFIX}/${encodeURIComponent(cat)}/${encodeURIComponent(f)}`.replace(/%2F/g, '/');
+        img.src = src;
+        img.alt = f;
         // friendly name (strip extension, replace underscores/dashes with spaces, capitalize)
         const friendly = (f || '').replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').replace(/\s+/g,' ').trim();
         const friendlyLabel = friendly.split(' ').map(s=> s.charAt(0).toUpperCase()+s.slice(1)).join(' ');
@@ -582,6 +583,7 @@
   </script>
 </body>
 </html>
+
 
 
 
