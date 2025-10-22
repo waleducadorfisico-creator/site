@@ -157,10 +157,14 @@
   (function(){
     // Ensure we're using the correct path for categories.json and images
     const pathname = window.location.pathname || '';
-    const base = '/site-main';
+    // Detect environment (Vercel vs GitHub Pages vs Local)
+    const isVercel = window.location.hostname.includes('vercel.app');
+    const base = isVercel ? '' : '/site-main';
     const PUBLIC_PREFIX = (base + '/docs/public/Treinos').replace(/\/\//g, '/');
+    console.log('Is Vercel:', isVercel);
     console.log('Base path:', base);
     console.log('Public prefix:', PUBLIC_PREFIX);
+    console.log('Hostname:', window.location.hostname);
 
     // debug bar removed in production build
 
@@ -583,9 +587,6 @@
   </script>
 </body>
 </html>
-
-
-
 
 
 
