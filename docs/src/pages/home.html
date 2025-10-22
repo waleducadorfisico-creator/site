@@ -523,7 +523,7 @@
 
           // build content only for this day
           for(const ex of assignments[dia]){
-            const src = `${PUBLIC_PREFIX}/treinos/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
+            const src = `${PUBLIC_PREFIX}/Treinos/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
             let dataUrl = src;
             try{
               const resp = await fetch(src);
@@ -583,6 +583,7 @@
   </script>
 </body>
 </html>
+
 
 
 
