@@ -157,7 +157,7 @@
   (function(){
     // Ensure we're using the correct path for categories.json and images
     const pathname = window.location.pathname || '';
-    const base = '/site';
+    const base = '/site-main';
     const PUBLIC_PREFIX = (base + '/docs/public/Treinos').replace(/\/\//g, '/');
     console.log('Base path:', base);
     console.log('Public prefix:', PUBLIC_PREFIX);
@@ -483,7 +483,7 @@
             try{ const crt = card.cloneNode(true); crt.style.position='absolute'; crt.style.top='-1000px'; document.body.appendChild(crt); ev.dataTransfer.setDragImage(crt,20,20); setTimeout(()=> document.body.removeChild(crt),0); }catch(e){}
           });
 
-          const img = document.createElement('img'); img.src = (PUBLIC_PREFIX + '/Treinos/' + encodeURIComponent(it.categoria) + '/' + encodeURIComponent(it.file)).replace(/%2F/g, '/');
+          const img = document.createElement('img'); img.src = (PUBLIC_PREFIX + '/' + encodeURIComponent(it.categoria) + '/' + encodeURIComponent(it.file)).replace(/%2F/g, '/');
           const meta = document.createElement('div'); meta.className='meta';
           const name = document.createElement('div'); name.className='name'; name.textContent = stripExt(it.file);
           const sets = document.createElement('div'); sets.className='sets'; sets.textContent = it.sets || '';
@@ -523,7 +523,7 @@
 
           // build content only for this day
           for(const ex of assignments[dia]){
-            const src = `${PUBLIC_PREFIX}/Treinos/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
+            const src = `${PUBLIC_PREFIX}/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
             let dataUrl = src;
             try{
               const resp = await fetch(src);
@@ -583,7 +583,6 @@
   </script>
 </body>
 </html>
-
 
 
 
