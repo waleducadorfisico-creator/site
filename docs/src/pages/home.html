@@ -13,13 +13,7 @@
     .cat-btn.active{ background:#eef2ff;border-color:#c7ddff; font-weight:700 }
     /* external gallery */
   #gifsGallery{ margin:12px auto; max-width:1200px; display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:10px }
-    #gifsGallery .gifItem{ background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e6e9ee; display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start; min-height:90px; position: relative }
-    #gifsGallery .gifItem.loading{ background:#f8f9fa }
-    #gifsGallery .gifItem.loading::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, #f0f0f0 25%, #f8f8f8 50%, #f0f0f0 75%); background-size: 200% 100%; animation: loading 1.5s infinite; z-index: 1 }
-    @keyframes loading { 
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
+    #gifsGallery .gifItem{ background:#fff;border-radius:8px;overflow:hidden;border:1px solid #e6e9ee; display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start; min-height:90px }
     #gifsGallery img{ width:100%; height:140px; object-fit:cover; display:block }
     #gifsGallery .caption{ padding:6px 8px; font-size:0.85rem; color:#0f172a; text-align:center; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02)); }
     /* day boxes */
@@ -163,7 +157,7 @@
   (function(){
     // Ensure we're using the correct path for categories.json and images
     const pathname = window.location.pathname || '';
-    const base = '/site-main';
+    const base = '/site';
     const PUBLIC_PREFIX = (base + '/docs/public/Treinos').replace(/\/\//g, '/');
     console.log('Base path:', base);
     console.log('Public prefix:', PUBLIC_PREFIX);
@@ -227,68 +221,13 @@
         console.error('No files found for category:', cat);
         return; 
       }
-      
-      // Create image loading observer
-      const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            if (img.dataset.src) {
-              const tempImg = new Image();
-              tempImg.onload = () => {
-                img.src = img.dataset.src;
-                img.parentElement.classList.remove('loading');
-              };
-              tempImg.src = img.dataset.src;
-              delete img.dataset.src;
-              observer.unobserve(img);
-            }
-          }
-        });
-      }, {
-        rootMargin: '50px 0px',
-        threshold: 0.1
-      });
-
       // persist sets value on change
       if(setsInput){ setsInput.addEventListener('input', (e)=>{ try{ localStorage.setItem('gifs_sets', e.target.value || ''); }catch(ex){} }); }
-      
-      // Create an intersection observer for lazy loading
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            if (img.dataset.src) {
-              img.parentElement.classList.add('loading');
-              // Load the actual GIF
-              const tempImg = new Image();
-              tempImg.onload = () => {
-                img.src = img.dataset.src;
-                img.parentElement.classList.remove('loading');
-              };
-              tempImg.src = img.dataset.src;
-              delete img.dataset.src;
-              observer.unobserve(img);
-            }
-          }
-        });
-      }, {
-        rootMargin: '50px 0px',
-        threshold: 0.1
-      });
-
-      // Process all files with optimized loading
-      files.forEach((f, index) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'gifItem loading';
+      files.forEach(f=>{
+        const wrapper = document.createElement('div'); wrapper.className = 'gifItem';
         const img = document.createElement('img');
         const src = `${PUBLIC_PREFIX}/${encodeURIComponent(cat)}/${encodeURIComponent(f)}`.replace(/%2F/g, '/');
-        
-        // Set up progressive loading for all images
         img.src = src;
-        img.onload = () => {
-          wrapper.classList.remove('loading');
-        };
         img.alt = f;
         // friendly name (strip extension, replace underscores/dashes with spaces, capitalize)
         const friendly = (f || '').replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').replace(/\s+/g,' ').trim();
@@ -544,29 +483,7 @@
             try{ const crt = card.cloneNode(true); crt.style.position='absolute'; crt.style.top='-1000px'; document.body.appendChild(crt); ev.dataTransfer.setDragImage(crt,20,20); setTimeout(()=> document.body.removeChild(crt),0); }catch(e){}
           });
 
-          const img = document.createElement('img');
-          const imgSrc = (PUBLIC_PREFIX + '/' + encodeURIComponent(it.categoria) + '/' + encodeURIComponent(it.file)).replace(/%2F/g, '/');
-          img.dataset.src = imgSrc;
-          img.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"%3E%3C/svg%3E';
-          // Lazy load using Intersection Observer
-          const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-              if (entry.isIntersecting) {
-                const img = entry.target;
-                if (img.dataset.src) {
-                  const tempImg = new Image();
-                  tempImg.onload = () => {
-                    img.src = img.dataset.src;
-                  };
-                  tempImg.src = img.dataset.src;
-                  delete img.dataset.src;
-                  observer.unobserve(img);
-                }
-              }
-            });
-          }, { rootMargin: '50px 0px', threshold: 0.1 });
-          observer.observe(img);
-          
+          const img = document.createElement('img'); img.src = (PUBLIC_PREFIX + '/Treinos/' + encodeURIComponent(it.categoria) + '/' + encodeURIComponent(it.file)).replace(/%2F/g, '/');
           const meta = document.createElement('div'); meta.className='meta';
           const name = document.createElement('div'); name.className='name'; name.textContent = stripExt(it.file);
           const sets = document.createElement('div'); sets.className='sets'; sets.textContent = it.sets || '';
@@ -606,7 +523,7 @@
 
           // build content only for this day
           for(const ex of assignments[dia]){
-            const src = `${PUBLIC_PREFIX}/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
+            const src = `${PUBLIC_PREFIX}/Treinos/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
             let dataUrl = src;
             try{
               const resp = await fetch(src);
