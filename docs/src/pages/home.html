@@ -155,12 +155,54 @@
 
   <script type="module">
   (function(){
-    // Ensure we're using the correct path for categories.json and images
-    const pathname = window.location.pathname || '';
-    const base = '/site';
-    const PUBLIC_PREFIX = (base + '/docs/public/Treinos').replace(/\/\//g, '/');
-    console.log('Base path:', base);
-    console.log('Public prefix:', PUBLIC_PREFIX);
+    // Defensive: block accidental assignments of `src` to undefined or falsy values
+    try{
+      const imgDesc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
+      const origImgSet = imgDesc && imgDesc.set;
+      if(origImgSet){
+        Object.defineProperty(HTMLImageElement.prototype, 'src', {
+          set: function(v){ if(!v || v === 'undefined'){ console.warn('Blocked image.src assignment to', v, this); return; } origImgSet.call(this, v); }
+        });
+      }
+      const ifDesc = Object.getOwnPropertyDescriptor(HTMLIFrameElement.prototype, 'src');
+      const origIfSet = ifDesc && ifDesc.set;
+      if(origIfSet){
+        Object.defineProperty(HTMLIFrameElement.prototype, 'src', {
+          set: function(v){ if(!v || v === 'undefined'){ console.warn('Blocked iframe.src assignment to', v, this); return; } origIfSet.call(this, v); }
+        });
+      }
+    }catch(e){ /* ignore in very old browsers */ }
+    // Guard fetch() and XHR to avoid accidental requests to 'undefined' paths
+    try{
+      const _fetch = window.fetch;
+      window.fetch = function(input, init){
+        const url = (typeof input === 'string') ? input : (input && input.url);
+        if(!url || url === 'undefined' || (typeof url === 'string' && url.indexOf('/undefined') !== -1)){
+          console.warn('Blocked fetch to invalid URL:', url, { input, init });
+          return Promise.reject(new Error('Blocked fetch to invalid URL'));
+        }
+        return _fetch.apply(this, arguments);
+      };
+    }catch(e){ /* ignore */ }
+    try{
+      const _open = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(method, url){
+        if(!url || url === 'undefined' || (typeof url === 'string' && url.indexOf('/undefined') !== -1)){
+          console.warn('Blocked XHR.open to invalid URL:', url, { method });
+          return; // abort by not calling original open
+        }
+        return _open.apply(this, arguments);
+      };
+    }catch(e){ /* ignore */ }
+  // Ensure we're using the correct path for categories.json and images
+  const pathname = window.location.pathname || '';
+  // We'll attempt to detect the correct PUBLIC_PREFIX at runtime. Start with a sensible default but allow detection later.
+  let detectedPrefix = null;
+  function resolveCandidatePrefix(cand){ return (cand + '/docs/public/Treinos').replace(/\/\/+/g, '/'); }
+  // common bases to try if detection is needed
+  const commonBases = ['', '/site', '/site-main', location.pathname.replace(/\/index\.html$|\/$/, '') || ''];
+  let PUBLIC_PREFIX = resolveCandidatePrefix(commonBases[1] || '/site');
+  console.log('Initial PUBLIC_PREFIX guess:', PUBLIC_PREFIX);
 
     // debug bar removed in production build
 
@@ -226,8 +268,10 @@
       files.forEach(f=>{
         const wrapper = document.createElement('div'); wrapper.className = 'gifItem';
         const img = document.createElement('img');
-        const src = `${PUBLIC_PREFIX}/${encodeURIComponent(cat)}/${encodeURIComponent(f)}`.replace(/%2F/g, '/');
-        img.src = src;
+  const src = `${PUBLIC_PREFIX}/${encodeURIComponent(cat)}/${encodeURIComponent(f)}`.replace(/%2F/g, '/');
+  img.src = src;
+  // keep a stable reference to the full image URL for click-to-open
+  img.dataset.fullsrc = src;
         img.alt = f;
         // friendly name (strip extension, replace underscores/dashes with spaces, capitalize)
         const friendly = (f || '').replace(/\.[^.]+$/, '').replace(/[_\-]+/g, ' ').replace(/\s+/g,' ').trim();
@@ -236,8 +280,10 @@
         img.addEventListener('click', (ev)=>{
           ev.stopPropagation();
           const currentSets = (setsInput && setsInput.value) ? setsInput.value.trim() : '';
-          if(selectedDay){ addGifToDay(selectedDay, { categoria: cat, file: f, sets: currentSets }); renderDayBoxes(); }
-          else { window.open(src, '_blank'); }
+          if(selectedDay){ addGifToDay(selectedDay, { categoria: cat, file: f, sets: currentSets }); renderDayBoxes(); return; }
+          const openUrl = img.dataset.fullsrc || img.src || src;
+          if(openUrl){ try{ window.open(openUrl, '_blank'); }catch(e){ console.warn('Erro ao abrir imagem', openUrl, e); } }
+          else { console.warn('Nenhuma URL disponível para abrir a imagem', { cat, f }); }
         });
         wrapper.appendChild(img);
         const previewSets = (setsInput && setsInput.value) ? setsInput.value.trim() : '';
@@ -264,62 +310,47 @@
       toggleDropdown(false);
     });
 
-    // load categories directly from categories.json only
+    // load categories: try multiple candidate paths to be robust to different hosting bases
     async function loadCategories(){
-      categories = null; // Reset categories to force reload
-      try {
-        const p = (PUBLIC_PREFIX + '/categories.json').replace(/\/\//g, '/');
-        console.log('Loading categories from:', p);
-        const rj = await fetch(p, { 
-          cache: 'no-store',  // Prevent caching
-          headers: { 'Cache-Control': 'no-cache' }
-        });
-        if(!rj.ok) {
-          console.error('Failed to fetch categories.json:', rj.status, rj.statusText);
-          throw new Error('Failed to fetch categories.json');
-        }
-        const j = await rj.json(); 
-        if (!j || !j.categories) {
-          console.error('Invalid categories.json format:', j);
-          throw new Error('Invalid categories format');
-        }
-        // Convert categories array to object format
-        const categoriesObj = {};
-        j.categories.forEach(cat => {
-          categoriesObj[cat.name] = cat.exercises;
-        });
-        categories = categoriesObj;
-        console.log('Loaded categories:', Object.keys(categories));
-        return categories;
-      } catch(e) {
-        console.error('Error loading categories:', e);
-        throw new Error('Categories not found');
-      }
+      categories = null;
+      const candidates = [];
+      // primary: PUBLIC_PREFIX/categories.json
+      candidates.push((PUBLIC_PREFIX + '/categories.json').replace(/\/\/+/g, '/'));
+      // common repo/site prefixes the site might be served from
+      candidates.push('/site-main/docs/public/Treinos/categories.json');
+      candidates.push('/site/docs/public/Treinos/categories.json');
+      candidates.push('/docs/public/Treinos/categories.json');
+      candidates.push('docs/public/Treinos/categories.json');
+      candidates.push('./docs/public/Treinos/categories.json');
+      // try using location.pathname as base (handles index.html under a folder)
+      try{ const basePath = location.pathname.replace(/\/index\.html$|\/$/, ''); candidates.push((basePath + '/docs/public/Treinos/categories.json').replace(/\/\/+/g, '/')); }catch(e){}
+
+      console.log('Attempting to load categories.json from candidates:', candidates);
       let lastErr = null;
-      for(const cand of candidates){
-        try{ const mod = await import(cand); if(mod && mod.categories){ categories = mod.categories; return categories; } }catch(err){ lastErr = err; }
-      }
-      // try fetch+eval of JS file
-      for(const cand of candidates){
+      for(const p of candidates){
+        if(!p) continue;
         try{
-          const r = await fetch(cand);
-          if(!r.ok) continue;
-          const txt = await r.text();
-          if(/\bcategories\b/.test(txt)){
-            try{
-              const wrapper = `(function(){ let categories = {}; ${txt}; return typeof categories !== 'undefined' ? categories : (typeof window !== 'undefined' && window.categories) ? window.categories : {}; })()`;
-              const res = eval(wrapper);
-              if(res && Object.keys(res).length){ categories = res; return categories; }
-            }catch(e){ lastErr = e; }
+          console.log('Trying', p);
+          const r = await fetch(p, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } });
+          if(!r.ok){ console.warn('Fetch failed for', p, r.status); lastErr = new Error('Fetch failed: ' + r.status); continue; }
+          const j = await r.json();
+          if(!j){ lastErr = new Error('Empty JSON at ' + p); continue; }
+          // If file contains { categories: [...] } normalize to object form
+          if(Array.isArray(j.categories) || j.categories){
+            const categoriesObj = {};
+            (j.categories || []).forEach(cat => { if(cat && cat.name) categoriesObj[cat.name] = cat.exercises || []; });
+            categories = categoriesObj;
+            // set PUBLIC_PREFIX based on successful candidate (strip /categories.json)
+            try{ const prefix = p.replace(/\/categories\.json$/, '').replace(/\/categories\.json\/?$/, ''); PUBLIC_PREFIX = prefix; console.log('Detected PUBLIC_PREFIX set to', PUBLIC_PREFIX); }catch(e){}
+            console.log('Loaded categories from', p, Object.keys(categories));
+            return categories;
           }
-        }catch(e){ lastErr = e; }
+          // If it's already an object with mapping
+          if(typeof j === 'object' && !Array.isArray(j) && Object.keys(j).length){ categories = j; try{ const prefix = p.replace(/\/categories\.json$/, ''); PUBLIC_PREFIX = prefix; console.log('Detected PUBLIC_PREFIX set to', PUBLIC_PREFIX); }catch(e){} console.log('Loaded categories (object) from', p); return categories; }
+          lastErr = new Error('Invalid categories format at ' + p);
+        }catch(err){ console.warn('Candidate fetch error', p, err); lastErr = err; }
       }
-      // try public JSON fallback
-      try{
-        const p = (PUBLIC_PREFIX + '/categories.json').replace(/\/\//g, '/');
-        const rj = await fetch(p);
-        if(rj.ok){ const j = await rj.json(); categories = j; return categories; }
-      }catch(e){ lastErr = lastErr || e; }
+      console.error('Error loading categories, no candidate succeeded');
       throw lastErr || new Error('categories not found');
     }
 
@@ -483,9 +514,11 @@
             try{ const crt = card.cloneNode(true); crt.style.position='absolute'; crt.style.top='-1000px'; document.body.appendChild(crt); ev.dataTransfer.setDragImage(crt,20,20); setTimeout(()=> document.body.removeChild(crt),0); }catch(e){}
           });
 
-          const img = document.createElement('img');
-          img.src = `${PUBLIC_PREFIX}/${encodeURIComponent(it.categoria)}/${encodeURIComponent(it.file)}`.replace(/%2F/g, '/');
-
+          // build full URL and attach as stable dataset attribute
+          const fullUrl = (PUBLIC_PREFIX + '/' + encodeURIComponent(it.categoria) + '/' + encodeURIComponent(it.file)).replace(/%2F/g, '/');
+          const img = document.createElement('img'); img.src = fullUrl; img.dataset.fullsrc = fullUrl;
+          // clicking the thumbnail should open the full GIF
+          img.addEventListener('click', (ev)=>{ ev.stopPropagation(); const openUrl = img.dataset.fullsrc || img.src; if(openUrl){ try{ window.open(openUrl, '_blank'); }catch(e){ console.warn('Erro ao abrir thumb', openUrl, e); } } else { console.warn('Thumb sem URL', it); } });
           const meta = document.createElement('div'); meta.className='meta';
           const name = document.createElement('div'); name.className='name'; name.textContent = stripExt(it.file);
           const sets = document.createElement('div'); sets.className='sets'; sets.textContent = it.sets || '';
@@ -525,7 +558,7 @@
 
           // build content only for this day
           for(const ex of assignments[dia]){
-            const src = `${PUBLIC_PREFIX}/Treinos/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
+            const src = `${PUBLIC_PREFIX}/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g, '/');
             let dataUrl = src;
             try{
               const resp = await fetch(src);
@@ -533,33 +566,24 @@
             }catch(e){ console.warn('Não foi possível embutir', src, e); }
 
             // detect sets / time from ex.sets
-            let isTimed = false; 
-            let secondsForBtn = 60; 
-            let setsLabel = ex.sets || '';
-            try {
-              const detalhe = (ex.sets || '').toString();
+            let isTimed = false; let secondsForBtn = 60; let setsLabel = ex.sets || '';
+            try{
+              const detalhe = (ex.sets||'').toString();
               const tm = detalhe.match(/(\d+)\s*(?:min(?:uto)?s?)/i);
-              if (tm) {
-                isTimed = true; 
-                secondsForBtn = parseInt(tm[1],10) * 60; 
-                setsLabel = tm[1] + (tm[1] === '1' ? ' minuto' : ' minutos');
-            } else {
-              const s = detalhe.match(/(\d+)\s*[x×]\s*(\d+)/);
-              if (s) { setsLabel = s[1] + 'x' + s[2]; }
+              if(tm){ isTimed = true; secondsForBtn = parseInt(tm[1],10) * 60; setsLabel = tm[1] + (tm[1]==='1' ? ' minuto' : ' minutos'); }
+              else {
+                const s = detalhe.match(/(\d+)\s*[x×]\s*(\d+)/);
+                if(s){ setsLabel = s[1] + 'x' + s[2]; }
               }
-            } catch(e) { }
+            }catch(e){ }
 
-          const cleanedName = stripExt(ex.file);
-          const btnLabel = isTimed ? 'Concluir' : ('Iniciar ' + secondsForBtn + 's');
-
-          // Caminho correto para imagem (corrigido)
-          const imgPath = `${base}/docs/public/Treinos/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g,'/');
-
-          html += `<div class="exercise" data-ex="${cleanedName}" data-sets="${isTimed ? 0 : (ex.sets || '')}" data-timed="${isTimed ? 'true' : 'false'}">`;
-          html += `<img src="${imgPath}" alt="${cleanedName}" style="width:100%;max-width:200px;border-radius:8px;object-fit:cover;">`;
-          html += `<div class="ex-info"><div class="ex-name">${cleanedName}</div><div class="meta-row"><div class="sets-ref">${setsLabel}</div><input class="load-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="kg"></div><div class="ex-detail">${ex.sets || ''}</div></div>`;
-          html += `<div class="controls"><button class="timer-btn" data-seconds="${secondsForBtn}">${btnLabel}</button><div class="timer-display"></div></div></div>`;
-
+            const cleanedName = stripExt(ex.file);
+            const btnLabel = isTimed ? 'Concluir' : ('Iniciar ' + secondsForBtn + 's');
+            html += '<div class="exercise" data-ex="'+ cleanedName + '" data-sets="'+ (isTimed?0: (ex.sets||'')) + '" data-timed="'+ (isTimed? 'true':'false') + '">';
+            html += '<img src="'+ dataUrl +'" alt="'+ cleanedName + '">';
+            html += '<div class="ex-info"><div class="ex-name">'+ cleanedName +'</div><div class="meta-row"><div class="sets-ref">'+ setsLabel + '</div><input class="load-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="kg"></div><div class="ex-detail">'+ (ex.sets||'') +'</div></div>';
+            html += '<div class="controls"><button class="timer-btn" data-seconds="'+ secondsForBtn + '">'+ btnLabel +'</button><div class="timer-display"></div></div></div>';
+          }
 
           // append script (same logic as in provided template)
           html += `</div></div><script>(function(){function formatTime(s){ const m = Math.floor(s/60); const sec = s%60; return (m>0?m+':':'') + (sec<10?('0'+sec):sec); }document.querySelectorAll('.exercise').forEach(card=>{const btn = card.querySelector('.timer-btn'); const setsDisplay = card.querySelector('.sets-ref'); const loadInput = card.querySelector('.load-input'); let sets = parseInt(card.dataset.sets||'3',10); let secondsDefault = parseInt(btn.dataset.seconds||'60',10); let interval = null; btn.textContent = (card.dataset.timed==='true')? 'Concluir' : ('Iniciar ' + secondsDefault + 's'); function updateSetsUI(){ if(setsDisplay) setsDisplay.textContent = sets + (card.dataset.reps?('x'+card.dataset.reps):''); } try{ if(loadInput){ const key = 'treino_load_' + (card.dataset.ex || card.getAttribute('data-ex')); const saved = localStorage.getItem(key); if(saved) loadInput.value = saved; loadInput.addEventListener('input', e=>{ const v = (e.target.value||'').replace(/[^0-9]/g,'').slice(0,4); e.target.value = v; if(v) localStorage.setItem(key, v); else localStorage.removeItem(key); }); } }catch(e){} updateSetsUI(); btn.addEventListener('click', ()=>{ if(btn.disabled) return; const isTimed = card.dataset.timed === 'true'; if(isTimed){ sets = 0; updateSetsUI(); card.classList.add('completed'); btn.textContent = 'Concluído'; btn.disabled = true; return; } let remaining = secondsDefault; btn.disabled = true; btn.textContent = formatTime(remaining); interval = setInterval(()=>{ remaining--; if(remaining<=0){ clearInterval(interval); interval=null; sets = Math.max(0, sets-1); updateSetsUI(); if(sets === 0){ card.classList.add('completed'); btn.textContent = 'Concluído'; btn.disabled = true; } else { btn.disabled = false; btn.textContent = 'Iniciar ' + secondsDefault + 's'; } } else { btn.textContent = formatTime(remaining); } }, 1000); }); });})();<\/script></body></html>`;
@@ -594,8 +618,6 @@
   </script>
 </body>
 </html>
-
-
 
 
 
