@@ -532,24 +532,33 @@
             }catch(e){ console.warn('Não foi possível embutir', src, e); }
 
             // detect sets / time from ex.sets
-            let isTimed = false; let secondsForBtn = 60; let setsLabel = ex.sets || '';
-            try{
-              const detalhe = (ex.sets||'').toString();
-              const tm = detalhe.match(/(\d+)\s*(?:min(?:uto)?s?)/i);
-              if(tm){ isTimed = true; secondsForBtn = parseInt(tm[1],10) * 60; setsLabel = tm[1] + (tm[1]==='1' ? ' minuto' : ' minutos'); }
-              else {
-                const s = detalhe.match(/(\d+)\s*[x×]\s*(\d+)/);
-                if(s){ setsLabel = s[1] + 'x' + s[2]; }
-              }
-            }catch(e){ }
+            let isTimed = false; 
+            let secondsForBtn = 60; 
+            let setsLabel = ex.sets || '';
+            try {
+            const detalhe = (ex.sets || '').toString();
+            const tm = detalhe.match(/(\d+)\s*(?:min(?:uto)?s?)/i);
+            if (tm) {
+            isTimed = true; 
+            secondsForBtn = parseInt(tm[1],10) * 60; 
+            setsLabel = tm[1] + (tm[1] === '1' ? ' minuto' : ' minutos');
+            } else {
+            const s = detalhe.match(/(\d+)\s*[x×]\s*(\d+)/);
+            if (s) { setsLabel = s[1] + 'x' + s[2]; }
+            }
+            } catch(e) { }
 
-            const cleanedName = stripExt(ex.file);
-            const btnLabel = isTimed ? 'Concluir' : ('Iniciar ' + secondsForBtn + 's');
-            html += '<div class="exercise" data-ex="'+ cleanedName + '" data-sets="'+ (isTimed?0: (ex.sets||'')) + '" data-timed="'+ (isTimed? 'true':'false') + '">';
-            html += '<img src="'+ dataUrl +'" alt="'+ cleanedName + '">';
-            html += '<div class="ex-info"><div class="ex-name">'+ cleanedName +'</div><div class="meta-row"><div class="sets-ref">'+ setsLabel + '</div><input class="load-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="kg"></div><div class="ex-detail">'+ (ex.sets||'') +'</div></div>';
-            html += '<div class="controls"><button class="timer-btn" data-seconds="'+ secondsForBtn + '">'+ btnLabel +'</button><div class="timer-display"></div></div></div>';
-          }
+          const cleanedName = stripExt(ex.file);
+          const btnLabel = isTimed ? 'Concluir' : ('Iniciar ' + secondsForBtn + 's');
+
+          // Caminho correto para imagem (corrigido)
+          const imgPath = `${base}/docs/public/Treinos/${encodeURIComponent(ex.categoria)}/${encodeURIComponent(ex.file)}`.replace(/%2F/g,'/');
+
+          html += `<div class="exercise" data-ex="${cleanedName}" data-sets="${isTimed ? 0 : (ex.sets || '')}" data-timed="${isTimed ? 'true' : 'false'}">`;
+          html += `<img src="${imgPath}" alt="${cleanedName}" style="width:100%;max-width:200px;border-radius:8px;object-fit:cover;">`;
+          html += `<div class="ex-info"><div class="ex-name">${cleanedName}</div><div class="meta-row"><div class="sets-ref">${setsLabel}</div><input class="load-input" maxlength="4" inputmode="numeric" pattern="[0-9]*" placeholder="kg"></div><div class="ex-detail">${ex.sets || ''}</div></div>`;
+          html += `<div class="controls"><button class="timer-btn" data-seconds="${secondsForBtn}">${btnLabel}</button><div class="timer-display"></div></div></div>`;
+
 
           // append script (same logic as in provided template)
           html += `</div></div><script>(function(){function formatTime(s){ const m = Math.floor(s/60); const sec = s%60; return (m>0?m+':':'') + (sec<10?('0'+sec):sec); }document.querySelectorAll('.exercise').forEach(card=>{const btn = card.querySelector('.timer-btn'); const setsDisplay = card.querySelector('.sets-ref'); const loadInput = card.querySelector('.load-input'); let sets = parseInt(card.dataset.sets||'3',10); let secondsDefault = parseInt(btn.dataset.seconds||'60',10); let interval = null; btn.textContent = (card.dataset.timed==='true')? 'Concluir' : ('Iniciar ' + secondsDefault + 's'); function updateSetsUI(){ if(setsDisplay) setsDisplay.textContent = sets + (card.dataset.reps?('x'+card.dataset.reps):''); } try{ if(loadInput){ const key = 'treino_load_' + (card.dataset.ex || card.getAttribute('data-ex')); const saved = localStorage.getItem(key); if(saved) loadInput.value = saved; loadInput.addEventListener('input', e=>{ const v = (e.target.value||'').replace(/[^0-9]/g,'').slice(0,4); e.target.value = v; if(v) localStorage.setItem(key, v); else localStorage.removeItem(key); }); } }catch(e){} updateSetsUI(); btn.addEventListener('click', ()=>{ if(btn.disabled) return; const isTimed = card.dataset.timed === 'true'; if(isTimed){ sets = 0; updateSetsUI(); card.classList.add('completed'); btn.textContent = 'Concluído'; btn.disabled = true; return; } let remaining = secondsDefault; btn.disabled = true; btn.textContent = formatTime(remaining); interval = setInterval(()=>{ remaining--; if(remaining<=0){ clearInterval(interval); interval=null; sets = Math.max(0, sets-1); updateSetsUI(); if(sets === 0){ card.classList.add('completed'); btn.textContent = 'Concluído'; btn.disabled = true; } else { btn.disabled = false; btn.textContent = 'Iniciar ' + secondsDefault + 's'; } } else { btn.textContent = formatTime(remaining); } }, 1000); }); });})();<\/script></body></html>`;
@@ -584,6 +593,7 @@
   </script>
 </body>
 </html>
+
 
 
 
