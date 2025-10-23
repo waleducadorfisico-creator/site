@@ -607,8 +607,23 @@
         const blob = new Blob([html], { type:'text/html' });
         const url = URL.createObjectURL(blob);
         if(preview){ window.open(url, '_blank'); setTimeout(()=>URL.revokeObjectURL(url), 20000); }
-        else { const a = document.createElement('a'); a.style.display='none'; a.href = url; a.download = 'treino_exportado.html'; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=> URL.revokeObjectURL(url), 500); }
-      }catch(err){ console.error('ExportTreinoHTML', err); alert('Exportação com suscesso.'); }
+        else {
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = 'treino_exportado.html';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          setTimeout(() => URL.revokeObjectURL(url), 500);
+
+          alert('Exportação realizada com sucesso!'); // mensagem certa, no lugar certo
+        }
+        } catch (err) {
+          console.error('ExportTreinoHTML', err);
+          alert('Ocorreu um erro durante a exportação.');
+        }
+
       finally{ if(eb && !preview){ eb.disabled = false; eb.textContent = prevLabel || 'Exportar Treino (HTML)'; } }
     }
 
@@ -618,6 +633,7 @@
   </script>
 </body>
 </html>
+
 
 
 
