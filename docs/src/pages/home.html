@@ -484,7 +484,8 @@
           });
 
           const img = document.createElement('img');
-          img.src = `${PUBLIC_PREFIX.replace(/\/Treinos$/,'')}/${encodeURIComponent(it.categoria)}/${encodeURIComponent(it.file)}`.replace(/%2F/g, '/');
+          img.src = `${PUBLIC_PREFIX}/${encodeURIComponent(it.categoria)}/${encodeURIComponent(it.file)}`.replace(/%2F/g, '/');
+
           const meta = document.createElement('div'); meta.className='meta';
           const name = document.createElement('div'); name.className='name'; name.textContent = stripExt(it.file);
           const sets = document.createElement('div'); sets.className='sets'; sets.textContent = it.sets || '';
@@ -593,6 +594,7 @@
   </script>
 </body>
 </html>
+
 
 
 
