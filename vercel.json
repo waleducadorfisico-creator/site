@@ -1,8 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/docs/src/pages/$1" }
-  ],
-  "buildCommand": "",
-  "outputDirectory": ".",
-  "framework": null
-}
