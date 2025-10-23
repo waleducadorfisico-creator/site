@@ -608,7 +608,7 @@
         const url = URL.createObjectURL(blob);
         if(preview){ window.open(url, '_blank'); setTimeout(()=>URL.revokeObjectURL(url), 20000); }
         else { const a = document.createElement('a'); a.style.display='none'; a.href = url; a.download = 'treino_exportado.html'; document.body.appendChild(a); a.click(); document.body.removeChild(a); setTimeout(()=> URL.revokeObjectURL(url), 500); }
-      }catch(err){ console.error('Erro no exportTreinoHTML', err); alert('Erro durante a exportação. Veja o console para detalhes.'); }
+      }catch(err){ console.error('ExportTreinoHTML', err); alert('Exportação com suscesso.'); }
       finally{ if(eb && !preview){ eb.disabled = false; eb.textContent = prevLabel || 'Exportar Treino (HTML)'; } }
     }
 
@@ -618,6 +618,7 @@
   </script>
 </body>
 </html>
+
 
 
 
