@@ -536,16 +536,16 @@
             let secondsForBtn = 60; 
             let setsLabel = ex.sets || '';
             try {
-            const detalhe = (ex.sets || '').toString();
-            const tm = detalhe.match(/(\d+)\s*(?:min(?:uto)?s?)/i);
-            if (tm) {
-            isTimed = true; 
-            secondsForBtn = parseInt(tm[1],10) * 60; 
-            setsLabel = tm[1] + (tm[1] === '1' ? ' minuto' : ' minutos');
+              const detalhe = (ex.sets || '').toString();
+              const tm = detalhe.match(/(\d+)\s*(?:min(?:uto)?s?)/i);
+              if (tm) {
+                isTimed = true; 
+                secondsForBtn = parseInt(tm[1],10) * 60; 
+                setsLabel = tm[1] + (tm[1] === '1' ? ' minuto' : ' minutos');
             } else {
-            const s = detalhe.match(/(\d+)\s*[x×]\s*(\d+)/);
-            if (s) { setsLabel = s[1] + 'x' + s[2]; }
-            }
+              const s = detalhe.match(/(\d+)\s*[x×]\s*(\d+)/);
+              if (s) { setsLabel = s[1] + 'x' + s[2]; }
+              }
             } catch(e) { }
 
           const cleanedName = stripExt(ex.file);
@@ -593,6 +593,7 @@
   </script>
 </body>
 </html>
+
 
 
 
